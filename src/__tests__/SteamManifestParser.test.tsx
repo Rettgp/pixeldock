@@ -11,7 +11,8 @@ describe('Valid manifest', () => {
     beforeEach(() => {
         mockFs({
             'valid_manifest.acf': `
-                "AppState" {
+                "AppState"
+                {
                     "appid"		"526870"
                     "universe"		"1"
                     "LauncherPath"		"C:\\Program Files (x86)\\Steam\\steam.exe"
@@ -75,17 +76,20 @@ describe('Invalid Manifest', () => {
     beforeEach(() => {
         mockFs({
             'invalid_appid.acf': `
-                "AppState" {
+                "AppState"
+                {
                     "name"		"Valid Game"
                     "StateFlags"		"4"
                 }`,
             'invalid_name.acf': `
-                "AppState" {
+                "AppState"
+                {
                     "appid"		"526870"
                     "StateFlags"		"4"
                 }`,
             'invalid_state.acf': `
-                "AppState" {
+                "AppState"
+                {
                     "appid"		"526870"
                     "name"		"Valid Game"
                 }`,

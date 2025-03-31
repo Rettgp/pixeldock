@@ -31,7 +31,9 @@ function createGameFromAcf(content: string): SteamGame {
             const newObj = {};
             stack[stack.length - 1][currentKey] = newObj;
             stack.push(newObj);
-        } else if (line !== '}') {
+        } else if (line === '}') {
+            stack.pop();
+        } else {
             const match = line.match(/"(.*?)"\s+"(.*?)"/);
             if (match) {
                 const [, key, value] = match;
@@ -45,15 +47,15 @@ function createGameFromAcf(content: string): SteamGame {
         }
     });
 
-    if (stack[0].appid === undefined) throw new InvalidAppId(stack[0].appid);
-    if (stack[0].name === undefined) throw new InvalidName(stack[0].name);
-    if (stack[0].StateFlags === undefined)
+    if (stack[0].AppState.appid === undefined) throw new InvalidAppId(stack[0].appid);
+    if (stack[0].AppState.name === undefined) throw new InvalidName(stack[0].name);
+    if (stack[0].AppState.StateFlags === undefined)
         throw new InvalidState(stack[0].StateFlags);
 
     return {
-        appid: stack[0].appid,
-        name: stack[0].name,
-        installed: stack[0].StateFlags === '4',
+        appid: stack[0].AppState.appid,
+        name: stack[0].AppState.name,
+        installed: stack[0].AppState.StateFlags === '4',
     } as SteamGame;
 }
 
