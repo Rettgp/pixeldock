@@ -2,11 +2,7 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
 function Hello() {
-  return (
-    <div>
-      content
-    </div>
-  );
+  return <div>content</div>;
 }
 
 export default function App() {
