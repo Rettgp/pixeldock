@@ -1,11 +1,20 @@
 .gameButton {
-    width: 255px;
-    height: 100px;
+    width: 15rem;
+    height: auto;
+    background: linear-gradient(rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.5));
+    display: flex;
+    overflow: hidden;
+}
+
+.gameButton:hover {
+    position: absolute;
+    width: 20rem;
+    height: auto;
     background: linear-gradient(rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.5));
 }
 
 img {
-    width: 255px;
-    height: 100px;
-    object-fit: cover;
+    flex-shrink: 1;
+    min-width: 100%;
+    min-height: 100%;
 }
