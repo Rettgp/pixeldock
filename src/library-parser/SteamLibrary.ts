@@ -32,6 +32,7 @@ export default class SteamLibrary implements LibraryConnector {
             .map((game) => {
                 return {
                     name: game.name,
+                    appid: game.appid,
                     heroPath: 'placeholder.png',
                     exe: `steam://rungameid/${game.appid}`,
                 } as Runnable;

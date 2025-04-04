@@ -1,5 +1,6 @@
 export interface Runnable {
     name: string;
+    appid: string;
     heroPath: string;
     exe: string;
 }

@@ -1,0 +1,11 @@
+.gameButton {
+    width: 255px;
+    height: 100px;
+    background: linear-gradient(rgba(255, 0, 0, 0.5), rgba(0, 0, 255, 0.5));
+}
+
+img {
+    width: 255px;
+    height: 100px;
+    object-fit: cover;
+}

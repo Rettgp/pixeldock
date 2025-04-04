@@ -10,7 +10,8 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, protocol, net } from 'electron';
+import url from 'url';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { IpcChannelInterface } from '../ipc/IpcChannelInterface';
@@ -49,6 +50,29 @@ class Main {
         app.on('window-all-closed', this.onWindowAllClosed);
         app.on('activate', this.onActivate);
 
+        protocol.registerSchemesAsPrivileged([
+            {
+                scheme: 'steamimages',
+                privileges: {
+                    bypassCSP: true,
+                    standard: true,
+                    secure: true,
+                    supportFetchAPI: true,
+                },
+            },
+        ]);
+        // eslint-disable-next-line promise/catch-or-return
+        app.whenReady().then(() => {
+            protocol.handle('steamimages', (request) => {
+                const filePath = request.url.slice('steamimages://'.length);
+                console.log(filePath);
+                // TODO: Get this path from settings
+                return net.fetch(
+                    `C:\\Program Files (x86)\\Steam\\appcache\\${filePath}`,
+                );
+            });
+        });
+
         this.registerIpcChannels(ipcChannels);
     }
 
@@ -80,7 +104,7 @@ class Main {
         this.mainWindow = new BrowserWindow({
             show: false,
             width: 1024,
-            height: 728,
+            height: 1000,
             transparent: true,
             frame: false,
             icon: getAssetPath('icon.png'),
