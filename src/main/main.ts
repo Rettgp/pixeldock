@@ -18,6 +18,8 @@ import {
     ipcMain,
     protocol,
     net,
+    Tray,
+    Menu,
 } from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -78,6 +80,8 @@ class Main {
                     `C:\\Program Files (x86)\\Steam\\appcache\\${filePath}`,
                 );
             });
+
+            this.createTray();
         });
 
         this.registerIpcChannels(ipcChannels);
@@ -93,6 +97,23 @@ class Main {
         if (!this.mainWindow) {
             this.createWindow();
         }
+    }
+
+    private getAssetPath(...paths: string[]): string {
+        const RESOURCES_PATH = app.isPackaged
+            ? path.join(process.resourcesPath, 'assets')
+            : path.join(__dirname, '../../assets');
+
+        return path.join(RESOURCES_PATH, ...paths);
+    }
+
+    private createTray() {
+        const tray = new Tray(this.getAssetPath('icon.png'));
+        const contextMenu = Menu.buildFromTemplate([
+            { label: 'Quit', click: () => app.quit() },
+        ]);
+        tray.setToolTip('Game Launch');
+        tray.setContextMenu(contextMenu);
     }
 
     private async createWindow() {
@@ -145,6 +166,8 @@ class Main {
                 this.mainWindow.show();
             }
         });
+
+        this.mainWindow.setSkipTaskbar(true);
 
         const menuBuilder = new MenuBuilder(this.mainWindow);
         menuBuilder.buildMenu();
