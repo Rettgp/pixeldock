@@ -1,6 +1,6 @@
 {
-  "name": "electron-react-boilerplate",
-  "description": "A foundation for scalable desktop apps",
+  "name": "game-launch",
+  "description": "A game launcher designed to be an overlay for desktops",
   "keywords": [
     "electron",
     "boilerplate",
@@ -12,25 +12,24 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/Rettgp/game-launch#readme",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/Rettgp/game-launch/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/Rettgp/game-launch.git"
   },
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Garrett Phelps",
+    "email": "garrphelps@gmail.com"
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
+      "name": "Garrett Phelps",
+      "email": "garrphelps@gmail.com",
+      "url": "https://github.com/rettgp"
     }
   ],
   "main": "./.erb/dll/main.bundle.dev.js",
@@ -177,8 +176,8 @@
     "webpack-merge": "^6.0.1"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "GameLaunch",
+    "appId": "org.rettgp.GameLaunch",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

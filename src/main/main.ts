@@ -127,10 +127,10 @@ class Main {
                     ? path.join(__dirname, 'preload.js')
                     : path.join(__dirname, '../../.erb/dll/preload.js'),
             },
+            alwaysOnTop: false,
         });
         this.mainWindow.setPosition(display.size.width - 950 / factor, 0);
 
-        this.mainWindow.webContents.openDevTools();
         this.mainWindow.loadFile('../../index.html');
 
         this.mainWindow.loadURL(resolveHtmlPath('index.html'));
