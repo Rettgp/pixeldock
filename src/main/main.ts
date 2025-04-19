@@ -10,8 +10,15 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, protocol, net } from 'electron';
-import url from 'url';
+import {
+    app,
+    screen,
+    BrowserWindow,
+    shell,
+    ipcMain,
+    protocol,
+    net,
+} from 'electron';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { IpcChannelInterface } from '../ipc/IpcChannelInterface';
@@ -101,21 +108,27 @@ class Main {
             return path.join(RESOURCES_PATH, ...paths);
         };
 
+        const display = screen.getPrimaryDisplay();
+        const factor = display.scaleFactor;
+        const monitorHeight = display.size.height;
         this.mainWindow = new BrowserWindow({
             show: false,
-            width: 1024,
-            height: 1000,
+            x: 0,
+            width: 950 / factor,
+            height: monitorHeight / factor,
             transparent: true,
             frame: false,
             icon: getAssetPath('icon.png'),
             resizable: false,
             webPreferences: {
                 nodeIntegration: true,
+                zoomFactor: 1.0 / factor,
                 preload: app.isPackaged
                     ? path.join(__dirname, 'preload.js')
                     : path.join(__dirname, '../../.erb/dll/preload.js'),
             },
         });
+        this.mainWindow.setPosition(display.size.width - 950 / factor, 0);
 
         this.mainWindow.webContents.openDevTools();
         this.mainWindow.loadFile('../../index.html');

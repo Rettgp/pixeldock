@@ -29,19 +29,7 @@ export default function App() {
                 <Route
                     path="/"
                     element={data.map((runnable, index) => (
-                        // <button
-                        //     type="button"
-                        //     key={index}
-                        //     onClick={() => {
-                        //         const ipc = new IpcService();
-                        //         ipc.send<{ reply: any }>('game-library', {
-                        //             params: ['playGame', runnable.exe],
-                        //         });
-                        //     }}
-                        // >
-                        //     {runnable.name}
-                        // </button>
-                        <GameButton key={index} appid={runnable.appid} />
+                        <GameButton key={index} runnable={runnable} />
                     ))}
                 />
             </Routes>

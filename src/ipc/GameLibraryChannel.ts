@@ -14,7 +14,6 @@ export default class GameLibraryChannel implements IpcChannelInterface {
         if (!request.responseChannel) {
             request.responseChannel = `${this.getName()}_response`;
         }
-        console.log(request.params);
         if (!request.params) {
             return;
         }
@@ -24,7 +23,6 @@ export default class GameLibraryChannel implements IpcChannelInterface {
             const runnables = steamLibrary.getGames(
                 'G:\\SteamLibrary\\steamapps', // TODO
             );
-            console.log(request.responseChannel);
             event.reply(request.responseChannel!, runnables);
         }
 

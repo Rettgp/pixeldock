@@ -12,18 +12,16 @@ body {
   height: 100vh;
   background: transparent;
   font-family: sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* -webkit-app-region: drag; */
-}
-
-button {
-    /* -webkit-app-region: no-drag */
+  margin: 0;
 }
 
 #root {
     display: flex;
     flex-direction: column;
-    min-width: 20rem;
+    align-items: flex-end;
+    overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }

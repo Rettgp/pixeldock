@@ -1,7 +1,7 @@
 import { IpcRequest } from './IpcChannelInterface';
 
 export default class IpcService {
-    public send<T>(channel: string, request: IpcRequest = {}, p0: { params: string[]; }): Promise<T> {
+    public send<T>(channel: string, request: IpcRequest = {}): Promise<T> {
         if (!request.responseChannel) {
             request.responseChannel = `${channel}_response_${new Date().getTime()}`;
         }

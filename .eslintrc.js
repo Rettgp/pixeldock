@@ -14,6 +14,7 @@ module.exports = {
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
         'class-methods-use-this': 'off',
+        'react/prop-types': 'off',
     },
     parserOptions: {
         ecmaVersion: 2022,
