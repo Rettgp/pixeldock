@@ -16,12 +16,14 @@
 }
 
 .gameButton:hover {
-    /* width: 20rem;
-    height: 8rem; */
     transform: scale(1.30);
     transform-origin: right top;
     z-index: 1;
     mask-image: none;
+}
+
+.gameButton:last-child:hover {
+    transform-origin: right bottom;
 }
 
 .gameButton:hover .gameTitle {
