@@ -1,6 +1,6 @@
 {
   "name": "game-launch",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A game launcher designed to be an overlay for desktops",
   "license": "MIT",
   "author": {
