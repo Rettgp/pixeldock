@@ -46,6 +46,21 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -s -X POST https://api.github.com/repos/${{ github.repository }}/releases \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "tag_name": "v0.0.1-debug",
+              "name": "Debug Release",
+              "body": "This is a test release created by a GitHub Action.",
+              "draft": false,
+              "prerelease": false
+            }'
+
       - name: Install and build
         run: |
           npm install
