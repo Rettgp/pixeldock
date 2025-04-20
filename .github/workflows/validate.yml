@@ -1,6 +1,12 @@
 name: Validate
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '44 16 * * 4'
 
 jobs:
   test:
@@ -13,3 +19,13 @@ jobs:
     steps:
       - name: Run tests using reusable action
         uses: ./.github/actions/test
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+    - name: Run CodeQL analysis using reusable action
+      uses: ./.github/actions/codeql
