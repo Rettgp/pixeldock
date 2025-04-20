@@ -39,6 +39,7 @@ jobs:
             echo "version_changed=true" >> $GITHUB_OUTPUT
           else
             echo "version_changed=false" >> $GITHUB_OUTPUT
+          fi
         env:
           OLD_VERSION: ${{ env.OLD_VERSION }}
           NEW_VERSION: ${{ env.NEW_VERSION }}
