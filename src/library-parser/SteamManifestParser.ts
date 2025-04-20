@@ -47,8 +47,10 @@ function createGameFromAcf(content: string): SteamGame {
         }
     });
 
-    if (stack[0].AppState.appid === undefined) throw new InvalidAppId(stack[0].appid);
-    if (stack[0].AppState.name === undefined) throw new InvalidName(stack[0].name);
+    if (stack[0].AppState.appid === undefined)
+        throw new InvalidAppId(stack[0].appid);
+    if (stack[0].AppState.name === undefined)
+        throw new InvalidName(stack[0].name);
     if (stack[0].AppState.StateFlags === undefined)
         throw new InvalidState(stack[0].StateFlags);
 
