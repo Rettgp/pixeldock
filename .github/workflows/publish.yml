@@ -49,14 +49,15 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
         run: |
-          curl -s -X POST https://api.github.com/repos/${{ github.repository }}/releases \
-            -H "Authorization: token $GH_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{
+          Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" `
+            -Method POST `
+            -Headers @{ Authorization = "token $env:GH_TOKEN"; "Content-Type" = "application/json" } `
+            -Body '{
               "tag_name": "v0.0.1-debug",
               "name": "Debug Release",
-              "body": "This is a test release created by a GitHub Action.",
+              "body": "Test release from Windows runner",
               "draft": false,
               "prerelease": false
             }'
