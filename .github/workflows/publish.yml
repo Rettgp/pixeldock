@@ -12,6 +12,7 @@ jobs:
     runs-on: macos-latest
     outputs:
       version_changed: ${{ steps.compare.outputs.version_changed }}
+      version: ${{ steps.compare.outputs.version }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -39,6 +40,7 @@ jobs:
             echo "version_changed=true" >> $GITHUB_OUTPUT
           else
             echo "version_changed=false" >> $GITHUB_OUTPUT
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
         env:
           OLD_VERSION: ${{ env.OLD_VERSION }}
           NEW_VERSION: ${{ env.NEW_VERSION }}
@@ -59,7 +61,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-  publish:
+  publish-release:
     needs: test
     runs-on: ${{ matrix.os }}
 
