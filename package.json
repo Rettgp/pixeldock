@@ -102,7 +102,7 @@
   "dependencies": {
     "@electron/notarize": "^3.0.0",
     "electron-debug": "^4.1.0",
-    "electron-log": "^5.3.3",
+    "electron-log": "^5.3.4",
     "electron-updater": "^6.3.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

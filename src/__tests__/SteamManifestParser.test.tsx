@@ -4,8 +4,8 @@ import {
     InvalidAppId,
     InvalidName,
     InvalidState,
-} from '../library-parser/SteamManifestParser';
-import SteamGame from '../library-parser/SteamGame';
+} from '../main/library-parser/SteamManifestParser';
+import { SteamGame } from '../main/types';
 
 describe('Valid manifest', () => {
     beforeEach(() => {

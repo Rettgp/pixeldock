@@ -1,7 +1,8 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import IpcService from '../ipc/IpcService';
 import { useEffect, useState } from 'react';
+import log from 'electron-log/renderer';
+import IpcService from '../ipc/IpcService';
 import GameButton from './components/GameButton';
 
 export default function App() {
@@ -11,12 +12,12 @@ export default function App() {
         const ipc = new IpcService();
         const fetchData = async () => {
             try {
-                const response = await ipc.send<{ reply: any[] }>(
-                    'game-library',
-                    { params: ['getGames'] },
-                );
+                const response = await ipc.send<any[]>('game-library', {
+                    params: ['getGames'],
+                });
                 setData(response);
             } catch (error) {
+                log.error(error);
             }
         };
 
@@ -29,6 +30,7 @@ export default function App() {
                 <Route
                     path="/"
                     element={data.map((runnable, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
                         <GameButton key={index} runnable={runnable} />
                     ))}
                 />

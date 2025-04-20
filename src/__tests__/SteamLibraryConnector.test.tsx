@@ -1,5 +1,5 @@
 import mockFs from 'mock-fs';
-import SteamLibrary from '../library-parser/SteamLibrary';
+import SteamLibrary from '../main/library-parser/SteamLibrary';
 
 describe('steam library parses all games from manifests', () => {
     beforeEach(() => {
@@ -36,14 +36,16 @@ describe('steam library parses all games from manifests', () => {
         const games = library.getGames('./steamapps');
         expect(games.length).toEqual(2);
         expect(games[0]).toEqual({
-            name: 'Satisfactory',
-            heroPath: 'placeholder.png',
+            appid: '5678',
             exe: 'steam://rungameid/5678',
+            heroPath: 'placeholder.png',
+            name: 'Satisfactory',
         });
         expect(games[1]).toEqual({
-            name: 'Path of Exile',
-            heroPath: 'placeholder.png',
+            appid: '9012',
             exe: 'steam://rungameid/9012',
+            heroPath: 'placeholder.png',
+            name: 'Path of Exile',
         });
     });
 });

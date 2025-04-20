@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import * as fs from 'fs';
 import log from 'electron-log/main';
-import SteamGame from './SteamGame';
+import { SteamGame } from '../types';
 
 export class InvalidAppId extends Error {
     constructor(appid: string) {

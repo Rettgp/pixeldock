@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import log from 'electron-log/renderer';
 import App from './App';
 import IpcService from '../ipc/IpcService';
 import ExampleChannel from '../ipc/ExampleChannel';
@@ -10,7 +11,7 @@ root.render(<App />);
 const ipc = new IpcService();
 ipc.send<{ reply: string }>(ExampleChannel.name)
     .then((reply) => {
-        console.log(reply);
+        log.info(reply);
         return reply;
     })
     .catch(() => {});

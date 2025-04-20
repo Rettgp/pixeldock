@@ -1,5 +1,6 @@
 import './GameButton.css';
 import IpcService from '../../ipc/IpcService';
+import { Runnable } from '../../main/types';
 
 function runGame(exePath: string) {
     const ipc = new IpcService();
@@ -8,24 +9,23 @@ function runGame(exePath: string) {
     });
 }
 
-export default function GameButton({ runnable }) {
+interface Props {
+    runnable: Runnable;
+}
+
+export default function GameButton({ runnable }: Props) {
     return (
         <button
             type="button"
             className="gameButton"
             onClick={() => runGame(runnable.exe)}
             style={{
+                // TODO: This needs to scan for a library_hero or a library_header
                 backgroundImage: `url(steamimages://librarycache/${runnable.appid}/library_hero.jpg)`,
             }}
         >
             <div className="hoverBackground" />
             <h1 className="gameTitle">{runnable.name}</h1>
-            {/* <img
-                // TODO: This needs to scan for a library_hero or a library_header
-                // eslint-disable-next-line no-octal-escape
-                src={`steamimages://librarycache/${runnable.appid}/library_hero.jpg`}
-                alt="hero"
-            /> */}
         </button>
     );
 }

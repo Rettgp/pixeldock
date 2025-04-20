@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import log from 'electron-log/main';
 import { parseManifest } from './SteamManifestParser';
-import { Runnable, LibraryConnector } from './LibraryConnector';
+import { Runnable, LibraryConnector } from '../types';
 
 export default class SteamLibrary implements LibraryConnector {
     getGames(directory: string): Runnable[] {

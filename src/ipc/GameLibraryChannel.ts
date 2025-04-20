@@ -1,6 +1,6 @@
 import { IpcMainEvent } from 'electron';
 import { IpcChannelInterface, IpcRequest } from './IpcChannelInterface';
-import SteamLibrary from '../library-parser/SteamLibrary';
+import SteamLibrary from '../main/library-parser/SteamLibrary';
 import spawnGame from '../process/spawnGame';
 
 export default class GameLibraryChannel implements IpcChannelInterface {

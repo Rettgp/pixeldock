@@ -21,11 +21,14 @@ import {
     Tray,
     Menu,
 } from 'electron';
+import log from 'electron-log/main';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { IpcChannelInterface } from '../ipc/IpcChannelInterface';
 import ExampleChannel from '../ipc/ExampleChannel';
 import GameLibraryChannel from '../ipc/GameLibraryChannel';
+
+log.initialize();
 
 if (process.env.NODE_ENV === 'production') {
     const sourceMapSupport = require('source-map-support');
