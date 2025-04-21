@@ -1,5 +1,5 @@
 import { IpcMainEvent } from 'electron';
-import log from 'electron-log/main';
+import log from 'electron-log/renderer';
 import { IpcChannelInterface, IpcRequest } from './IpcChannelInterface';
 
 export default class ExampleChannel implements IpcChannelInterface {
@@ -13,7 +13,7 @@ export default class ExampleChannel implements IpcChannelInterface {
         if (!request.responseChannel) {
             request.responseChannel = `${this.getName()}_response`;
         }
-        log.log('ping');
+        log.info('ping');
         event.reply(request.responseChannel, 'pong');
     }
 }
