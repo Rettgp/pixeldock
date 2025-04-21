@@ -46,22 +46,6 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: pwsh
-        run: |
-          Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" `
-            -Method POST `
-            -Headers @{ Authorization = "token $env:GH_TOKEN"; "Content-Type" = "application/json" } `
-            -Body '{
-              "tag_name": "v0.0.1-debug",
-              "name": "Debug Release",
-              "body": "Test release from Windows runner",
-              "draft": false,
-              "prerelease": false
-            }'
-
       - name: Install and build
         run: |
           npm install
@@ -69,8 +53,10 @@ jobs:
           npm run build
 
       - name: Publish releases
+        shell: pwsh
         env:
           # This is used for uploading release assets to github
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG: electron-builder
         run: |
           npm exec -- electron-builder --publish=always --win
