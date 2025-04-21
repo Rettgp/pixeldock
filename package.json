@@ -236,6 +236,7 @@
     ],
     "publish": {
       "provider": "github",
+      "releaseType": "release",
       "owner": "rettgp",
       "repo": "game-launch"
     }

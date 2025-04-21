@@ -59,4 +59,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEBUG: electron-builder
         run: |
-          npm exec -- electron-builder --publish=always --draft=false --prerelease=false --win
+          npm exec -- electron-builder --publish=always --win --draft=false --prerelease=false
