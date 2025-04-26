@@ -1,4 +1,6 @@
 import './GameButton.css';
+import { FaRegPlayCircle } from 'react-icons/fa';
+import { useState } from 'react';
 import IpcService from '../../ipc/IpcService';
 import { Runnable } from '../../main/types';
 
@@ -14,18 +16,27 @@ interface Props {
 }
 
 export default function GameButton({ runnable }: Props) {
+    const [isClicked, setIsClicked] = useState(false);
+
     return (
         <button
             type="button"
-            className="gameButton"
-            onClick={() => runGame(runnable.exe)}
+            className={`game-button ${isClicked ? 'fly-out' : ''}`}
+            onClick={() => {
+                setIsClicked(true);
+                runGame(runnable.exe);
+            }}
             style={{
                 // TODO: This needs to scan for a library_hero or a library_header
                 backgroundImage: `url(steamimages://librarycache/${runnable.appid}/library_hero.jpg)`,
             }}
+            onAnimationEnd={() => setIsClicked(false)}
         >
-            <div className="hoverBackground" />
-            <h1 className="gameTitle">{runnable.name}</h1>
+            <div className="hover-background" />
+            <h1 className="game-title">{runnable.name}</h1>
+            <div className="play-overlay">
+                <FaRegPlayCircle size={32} style={{}} />
+            </div>
         </button>
     );
 }
