@@ -77,6 +77,15 @@ class Main {
                     supportFetchAPI: true,
                 },
             },
+            {
+                scheme: 'local',
+                privileges: {
+                    bypassCSP: true,
+                    standard: true,
+                    secure: true,
+                    supportFetchAPI: true,
+                },
+            },
         ]);
         // eslint-disable-next-line promise/catch-or-return
         app.whenReady().then(() => {
@@ -87,6 +96,16 @@ class Main {
                 return net.fetch(
                     `C:\\Program Files (x86)\\Steam\\appcache\\${filePath}`,
                 );
+            });
+            protocol.handle('local', (request) => {
+                const filePath = request.url.slice('local://'.length);
+                console.log(filePath);
+                const url = filePath.replace(
+                    /^[a-z]\//,
+                    (match) => `${match[0].toUpperCase()}:/`,
+                );
+                console.log(url);
+                return net.fetch(url);
             });
         });
 

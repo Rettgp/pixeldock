@@ -13,9 +13,6 @@ export default class OpenFileChannel implements IpcChannelInterface {
         if (!request.responseChannel) {
             request.responseChannel = `${this.getName()}_response`;
         }
-        if (!request.params) {
-            return;
-        }
 
         const dialogPromise = dialog.showOpenDialog({
             properties: ['openFile'],

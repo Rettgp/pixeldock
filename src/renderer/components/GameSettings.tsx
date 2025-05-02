@@ -1,9 +1,12 @@
 import {
     Box,
     Button,
+    Card,
+    CardContent,
     DialogActions,
     DialogContent,
     DialogTitle,
+    Grid,
     Input,
     Modal,
     Sheet,
@@ -21,6 +24,7 @@ const openFileBrowser = (): Promise<string> => {
 };
 
 export default function GameSettings() {
+    const [games, setGames] = useState<CustomGame[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [formData, setFormData] = useState<CustomGame>({
         _id: '0',
@@ -29,13 +33,14 @@ export default function GameSettings() {
         heroPath: '',
     });
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+    const handleChange = (field: string, e: ChangeEvent<HTMLInputElement>) => {
+        setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
     const handleSave = () => {
         // window.electronAPI?.saveGameData(formData);
+        setGames([...games, formData]);
+        setFormData({ _id: '0', name: '', exe: '', heroPath: '' });
         setShowModal(false);
     };
 
@@ -53,96 +58,107 @@ export default function GameSettings() {
     };
 
     return (
-        <Box
-            height="100vh"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-        >
-            <Sheet
-                variant="outlined"
-                sx={{
-                    width: 200,
-                    height: 200,
-                    border: '2px dashed',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                }}
-                onClick={() => setShowModal(true)}
-            >
-                <Typography level="title-md" color="neutral">
-                    Add Game
-                </Typography>
-            </Sheet>
+        <Box p={2}>
+            <Typography level="h3" gutterBottom>
+                Games
+            </Typography>
 
-            <Modal open={showModal} onClose={() => setShowModal(false)}>
-                <Sheet
-                    variant="outlined"
-                    sx={{
-                        maxWidth: 500,
-                        mx: 'auto',
-                        mt: '10%',
-                        p: 3,
-                        borderRadius: 'md',
-                        boxShadow: 'lg',
-                        backgroundColor: 'background.surface',
-                    }}
-                >
-                    <DialogTitle>Add New Game</DialogTitle>
-                    <DialogContent>
-                        <Stack spacing={2}>
-                            <Input
-                                name="name"
-                                placeholder="Name"
-                                value={formData.name}
-                                onChange={handleChange}
+            <Grid container spacing={2}>
+                {/* Add Game Card */}
+                <Grid xs={6} sm={4} md={3}>
+                    <Card
+                        variant="outlined"
+                        onClick={() => setShowModal(true)}
+                        sx={{
+                            border: '2px dashed grey',
+                            height: 200,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        <Typography level="h4">+ Add Game</Typography>
+                    </Card>
+                </Grid>
+
+                {/* Display each game as a hero image card */}
+                {games.map((game, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Grid key={index} xs={6} sm={4} md={3}>
+                        <Card
+                            variant="outlined"
+                            sx={{ height: 200, p: 0, overflow: 'hidden' }}
+                        >
+                            <img
+                                src={`local://${game.heroPath}`}
+                                alt={game.name}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                }}
                             />
-                            <Stack direction="row" spacing={1}>
-                                <Input
-                                    name="executablePath"
-                                    placeholder="Executable Path"
-                                    value={formData.exe}
-                                    onChange={handleChange}
-                                    fullWidth
-                                />
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => handleBrowse('exe')}
-                                >
-                                    Browse
-                                </Button>
-                            </Stack>
-                            <Stack direction="row" spacing={1}>
-                                <Input
-                                    name="heroImagePath"
-                                    placeholder="Hero Image Path"
-                                    value={formData.heroPath}
-                                    onChange={handleChange}
-                                    fullWidth
-                                />
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => handleBrowse('heroPath')}
-                                >
-                                    Browse
-                                </Button>
-                            </Stack>
-                        </Stack>
-                    </DialogContent>
-                    <DialogActions sx={{ justifyContent: 'flex-end', mt: 2 }}>
+                            <CardContent
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    backgroundColor: 'rgba(0,0,0,0.6)',
+                                    color: '#fff',
+                                    width: '100%',
+                                }}
+                            >
+                                <Typography level="h5">{game.name}</Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+
+            {/* Modal for adding game */}
+            <Modal open={showModal} onClose={() => setShowModal(false)}>
+                <Card sx={{ width: 400, p: 3, mx: 'auto', mt: '10%' }}>
+                    <Typography level="h4" gutterBottom>
+                        Add New Game
+                    </Typography>
+                    <Input
+                        placeholder="Name"
+                        value={formData.name}
+                        onChange={(e) => handleChange('name', e)}
+                        sx={{ mb: 2 }}
+                    />
+                    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                        <Input
+                            placeholder="Executable Path"
+                            value={formData.exe}
+                            onChange={(e) => handleChange('exe', e)}
+                            sx={{ mb: 2 }}
+                        />
+                        <Button onClick={() => handleBrowse('exe')}>
+                            Browse
+                        </Button>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                        <Input
+                            placeholder="Hero Image Path"
+                            value={formData.heroPath}
+                            onChange={(e) => handleChange('heroPath', e)}
+                            sx={{ mb: 2 }}
+                        />
+                        <Button onClick={() => handleBrowse('heroPath')}>
+                            Browse
+                        </Button>
+                    </Box>
+                    <Box display="flex" justifyContent="flex-end" gap={1}>
                         <Button
                             variant="plain"
                             onClick={() => setShowModal(false)}
                         >
                             Cancel
                         </Button>
-                        <Button variant="solid" onClick={handleSave}>
-                            Save
-                        </Button>
-                    </DialogActions>
-                </Sheet>
+                        <Button onClick={handleSave}>Save</Button>
+                    </Box>
+                </Card>
             </Modal>
         </Box>
     );
