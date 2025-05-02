@@ -3,6 +3,7 @@ import log from 'electron-log/renderer';
 import App from './App';
 import IpcService from '../ipc/IpcService';
 import ExampleChannel from '../ipc/ExampleChannel';
+import '@fontsource/inter';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
