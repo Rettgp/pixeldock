@@ -7,12 +7,14 @@ import {
     DialogContent,
     DialogTitle,
     Grid,
+    IconButton,
     Input,
     Modal,
     Sheet,
     Stack,
     Typography,
 } from '@mui/joy';
+import DeleteIcon from '@mui/icons-material/Delete';
 import React, { useState, ChangeEvent } from 'react';
 import log from 'electron-log/renderer';
 import { CustomGame } from '../StorageType';
@@ -63,15 +65,24 @@ export default function GameSettings() {
                 Games
             </Typography>
 
-            <Grid container spacing={2}>
+            <Grid
+                container
+                spacing={2}
+                direction="column"
+                sx={{
+                    justifyContent: 'center',
+                    alignItems: 'stretch',
+                    flexGrow: 1,
+                }}
+            >
                 {/* Add Game Card */}
-                <Grid xs={6} sm={4} md={3}>
+                <Grid size="grow">
                     <Card
                         variant="outlined"
                         onClick={() => setShowModal(true)}
                         sx={{
                             border: '2px dashed grey',
-                            height: 200,
+                            height: '5rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -85,7 +96,7 @@ export default function GameSettings() {
                 {/* Display each game as a hero image card */}
                 {games.map((game, index) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <Grid key={index} xs={6} sm={4} md={3}>
+                    <Grid key={index} size="grow">
                         <Card
                             variant="outlined"
                             sx={{ height: 200, p: 0, overflow: 'hidden' }}
@@ -102,12 +113,33 @@ export default function GameSettings() {
                             <CardContent
                                 sx={{
                                     position: 'absolute',
+                                    padding: '.5rem',
                                     bottom: 0,
                                     backgroundColor: 'rgba(0,0,0,0.6)',
                                     color: '#fff',
                                     width: '100%',
                                 }}
                             >
+                                <IconButton
+                                    color="danger"
+                                    variant="solid"
+                                    size="sm"
+                                    onClick={() =>
+                                        setGames((prev) =>
+                                            prev.filter((_, i) => i !== index),
+                                        )
+                                    }
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 5,
+                                        right: 20,
+                                        zIndex: 2,
+                                        backgroundColor:
+                                            'rgba(255,255,255,0.8)',
+                                    }}
+                                >
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
                                 <Typography level="h5">{game.name}</Typography>
                             </CardContent>
                         </Card>
