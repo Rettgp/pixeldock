@@ -27,6 +27,8 @@ import { resolveHtmlPath } from './util';
 import { IpcChannelInterface } from '../ipc/IpcChannelInterface';
 import ExampleChannel from '../ipc/ExampleChannel';
 import GameLibraryChannel from '../ipc/GameLibraryChannel';
+import OpenFileChannel from '../ipc/OpenFileChannel';
+import NavigateChannel from '../ipc/NavigateChannel';
 
 log.initialize();
 
@@ -58,7 +60,10 @@ class Main {
     private mainWindow: BrowserWindow | undefined;
 
     public init(ipcChannels: IpcChannelInterface[]) {
-        app.on('ready', this.createWindow);
+        app.on('ready', () => {
+            this.createWindow();
+            this.createTray();
+        });
         app.on('window-all-closed', this.onWindowAllClosed);
         app.on('activate', this.onActivate);
 
@@ -83,8 +88,6 @@ class Main {
                     `C:\\Program Files (x86)\\Steam\\appcache\\${filePath}`,
                 );
             });
-
-            this.createTray();
         });
 
         this.registerIpcChannels(ipcChannels);
@@ -102,6 +105,12 @@ class Main {
         }
     }
 
+    private navigate(page: string) {
+        this.mainWindow?.webContents.send(NavigateChannel.name, {
+            params: [page],
+        });
+    }
+
     private getAssetPath(...paths: string[]): string {
         const RESOURCES_PATH = app.isPackaged
             ? path.join(process.resourcesPath, 'assets')
@@ -113,6 +122,10 @@ class Main {
     private createTray() {
         const tray = new Tray(this.getAssetPath('icon.png'));
         const contextMenu = Menu.buildFromTemplate([
+            {
+                label: 'Games',
+                click: () => this.navigate('game-settings'),
+            },
             { label: 'Quit', click: () => app.quit() },
         ]);
         tray.setToolTip('Game Launch');
@@ -191,4 +204,9 @@ class Main {
     }
 }
 
-new Main().init([new ExampleChannel(), new GameLibraryChannel()]);
+new Main().init([
+    new ExampleChannel(),
+    new GameLibraryChannel(),
+    new OpenFileChannel(),
+    new NavigateChannel(),
+]);

@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import { MemoryRouter as Router } from 'react-router-dom';
 import log from 'electron-log/renderer';
 import App from './App';
 import IpcService from '../ipc/IpcService';
@@ -7,7 +8,11 @@ import '@fontsource/inter';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
-root.render(<App />);
+root.render(
+    <Router>
+        <App />
+    </Router>,
+);
 
 const ipc = new IpcService();
 ipc.send<{ reply: string }>(ExampleChannel.name)

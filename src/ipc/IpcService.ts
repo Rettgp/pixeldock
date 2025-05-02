@@ -14,4 +14,8 @@ export default class IpcService {
             );
         });
     }
+
+    public listen(channel: string, callback: (request: IpcRequest) => void) {
+        window.electron.ipcRenderer.on(channel, callback);
+    }
 }
