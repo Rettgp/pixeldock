@@ -1,6 +1,6 @@
 import './GameButton.css';
 import { FaRegPlayCircle } from 'react-icons/fa';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import IpcService from '../../ipc/IpcService';
 import { Runnable } from '../../main/types';
 
@@ -18,6 +18,15 @@ interface Props {
 export default function GameButton({ runnable }: Props) {
     const [isClicked, setIsClicked] = useState(false);
 
+    useEffect(() => {
+        console.log(
+            'BackgroundImage for',
+            runnable.name,
+            '→',
+            runnable.heroPath,
+        );
+    }, [runnable]);
+
     return (
         <button
             type="button"
@@ -28,7 +37,7 @@ export default function GameButton({ runnable }: Props) {
             }}
             style={{
                 // TODO: This needs to scan for a library_hero or a library_header
-                backgroundImage: `url(steamimages://librarycache/${runnable.appid}/library_hero.jpg)`,
+                backgroundImage: `url(${runnable.heroPath})`,
             }}
             onAnimationEnd={() => setIsClicked(false)}
         >

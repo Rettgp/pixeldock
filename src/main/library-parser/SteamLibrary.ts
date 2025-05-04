@@ -33,7 +33,7 @@ export default class SteamLibrary implements LibraryConnector {
                 return {
                     name: game.name,
                     appid: game.appid,
-                    heroPath: 'placeholder.png',
+                    heroPath: '',
                     exe: `steam://rungameid/${game.appid}`,
                 } as Runnable;
             });

@@ -174,7 +174,7 @@ export default function GameSettings() {
                             sx={{ height: 200, p: 0, overflow: 'hidden' }}
                         >
                             <img
-                                src={`local://${game.heroPath}`}
+                                src={`steamimages://${game.heroPath}`}
                                 alt={game.name}
                                 style={{
                                     width: '100%',
@@ -248,7 +248,7 @@ export default function GameSettings() {
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                         <Input
-                            placeholder="Hero Image Path"
+                            placeholder="Hero Image Path (relative to steam directory"
                             value={formData.heroPath}
                             onChange={(e) => handleChange('heroPath', e)}
                             sx={{ mb: 2 }}

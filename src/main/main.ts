@@ -92,6 +92,7 @@ class Main {
         app.whenReady().then(() => {
             protocol.handle('steamimages', (request) => {
                 const filePath = request.url.slice('steamimages://'.length);
+                console.log(filePath);
                 // TODO: Get this path from settings
                 return net.fetch(
                     `C:\\Program Files (x86)\\Steam\\appcache\\${filePath}`,
@@ -99,6 +100,7 @@ class Main {
             });
             protocol.handle('local', (request) => {
                 const filePath = request.url.slice('local://'.length);
+                console.log(filePath);
                 const url = filePath.replace(
                     /^[a-z]\//,
                     (match) => `${match[0].toUpperCase()}:/`,

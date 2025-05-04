@@ -38,13 +38,13 @@ describe('steam library parses all games from manifests', () => {
         expect(games[0]).toEqual({
             appid: '5678',
             exe: 'steam://rungameid/5678',
-            heroPath: 'placeholder.png',
+            heroPath: '',
             name: 'Satisfactory',
         });
         expect(games[1]).toEqual({
             appid: '9012',
             exe: 'steam://rungameid/9012',
-            heroPath: 'placeholder.png',
+            heroPath: '',
             name: 'Path of Exile',
         });
     });

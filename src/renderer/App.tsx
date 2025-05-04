@@ -15,10 +15,34 @@ export default function App() {
         const ipc = new IpcService();
         const fetchData = async () => {
             try {
-                const response = await ipc.send<any[]>('game-library', {
+                const steamRunnables = await ipc.send<any[]>('game-library', {
                     params: ['getGames'],
                 });
-                setData(response);
+                let customGames = await ipc.send<any[]>('custom-games', {
+                    params: ['fetch'],
+                });
+                customGames = customGames ?? [];
+                customGames = customGames.map((game) => {
+                    return {
+                        name: game.name,
+                        appid: undefined,
+                        heroPath: `steamimages://${game.heroPath}`,
+                        exe: game.exe,
+                    };
+                });
+                const runnables = [...steamRunnables, ...customGames].map(
+                    (runnable) => {
+                        if (runnable.heroPath.length === 0 && runnable.appid) {
+                            return {
+                                ...runnable,
+                                heroPath: `steamimages://librarycache/${runnable.appid}/library_hero.jpg`,
+                            };
+                        }
+
+                        return runnable;
+                    },
+                );
+                setData(runnables);
             } catch (error) {
                 log.error(error);
             }
