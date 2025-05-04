@@ -165,10 +165,11 @@ class Main {
         const display = screen.getPrimaryDisplay();
         const factor = display.scaleFactor;
         const monitorHeight = display.size.height;
+        const preferredWidth = 500;
         this.mainWindow = new BrowserWindow({
             show: false,
             x: 0,
-            width: 950 / factor,
+            width: preferredWidth / factor,
             height: monitorHeight / factor,
             transparent: true,
             frame: false,
@@ -183,7 +184,10 @@ class Main {
             },
             alwaysOnTop: false,
         });
-        this.mainWindow.setPosition(display.size.width - 950 / factor, 0);
+        this.mainWindow.setPosition(
+            display.size.width - preferredWidth / factor,
+            0,
+        );
 
         this.mainWindow.loadFile('../../index.html');
 
