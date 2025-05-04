@@ -18,15 +18,6 @@ interface Props {
 export default function GameButton({ runnable }: Props) {
     const [isClicked, setIsClicked] = useState(false);
 
-    useEffect(() => {
-        console.log(
-            'BackgroundImage for',
-            runnable.name,
-            '→',
-            runnable.heroPath,
-        );
-    }, [runnable]);
-
     return (
         <button
             type="button"
