@@ -16,5 +16,8 @@
   },
   "dependencies": {
     "pouchdb": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/pouchdb": "^6.4.2"
   }
 }
