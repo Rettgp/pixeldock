@@ -1,5 +1,5 @@
 import './GameButton.css';
-import { FaRegPlayCircle } from 'react-icons/fa';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { useEffect, useState } from 'react';
 import IpcService from '../../ipc/IpcService';
 import { Runnable } from '../../main/types';
@@ -44,7 +44,7 @@ export default function GameButton({ runnable }: Props) {
             <div className="hover-background" />
             <h1 className="game-title">{runnable.name}</h1>
             <div className="play-overlay">
-                <FaRegPlayCircle size={32} style={{}} />
+                <PlayCircleOutlineIcon sx={{ 'font-size': 'xxx-large' }} />
             </div>
         </button>
     );
