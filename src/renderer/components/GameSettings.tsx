@@ -3,21 +3,20 @@ import {
     Button,
     Card,
     CardContent,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     Grid,
     IconButton,
     Input,
     Modal,
-    Sheet,
-    Stack,
+    Snackbar,
     Typography,
 } from '@mui/joy';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
-import React, { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import log from 'electron-log/renderer';
-import { CustomGame } from '../StorageType';
+import { useNavigate } from 'react-router-dom';
+import { CustomGame, Response } from '../../main/StorageType';
 import IpcService from '../../ipc/IpcService';
 
 const openFileBrowser = (): Promise<string> => {
@@ -26,24 +25,47 @@ const openFileBrowser = (): Promise<string> => {
 };
 
 export default function GameSettings() {
+    const navigate = useNavigate();
     const [games, setGames] = useState<CustomGame[]>([]);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [formData, setFormData] = useState<CustomGame>({
-        _id: '0',
+        _id: uuidv4(),
         name: '',
         exe: '',
         heroPath: '',
     });
+    const [errorOpen, setErrorOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleChange = (field: string, e: ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
     const handleSave = () => {
-        // window.electronAPI?.saveGameData(formData);
-        setGames([...games, formData]);
-        setFormData({ _id: '0', name: '', exe: '', heroPath: '' });
-        setShowModal(false);
+        const ipc = new IpcService();
+        ipc.send<Response>('custom-games', {
+            params: ['add', JSON.stringify(formData)],
+        })
+            .then((resp) => {
+                if (resp.ok) {
+                    setGames([...games, formData]);
+                    setFormData({
+                        _id: uuidv4(),
+                        name: '',
+                        exe: '',
+                        heroPath: '',
+                    });
+                    setShowModal(false);
+                } else {
+                    setErrorMessage(`Failed to save game`);
+                    setErrorOpen(true);
+                }
+                return resp;
+            })
+            .catch((error) => {
+                setErrorMessage(`Failed to save game - ${error}`);
+                setErrorOpen(true);
+            });
     };
 
     const handleBrowse = async (field: keyof CustomGame) => {
@@ -59,11 +81,61 @@ export default function GameSettings() {
             });
     };
 
+    const fetchGames = async () => {
+        const ipc = new IpcService();
+        ipc.send<CustomGame[]>('custom-games', {
+            params: ['fetch'],
+        })
+            .then((fetchedGames) => {
+                setGames(fetchedGames);
+                return fetchedGames;
+            })
+            .catch((error) => {
+                setErrorMessage(`Failed to fetch games - ${error}`);
+            });
+    };
+
+    const removeGame = async (id: string) => {
+        const ipc = new IpcService();
+        ipc.send<Response>('custom-games', {
+            params: ['remove', id],
+        })
+            .then((resp) => {
+                return resp;
+            })
+            .catch((error) => {
+                setErrorMessage(`Failed to remove game ${id} - ${error}`);
+            });
+    };
+
+    useEffect(() => {
+        fetchGames();
+    }, []);
+
     return (
         <Box p={2}>
-            <Typography level="h3" gutterBottom>
-                Games
-            </Typography>
+            <Button
+                variant="plain"
+                startDecorator={
+                    <ArrowBackIcon sx={{ 'font-size': 'xx-large' }} />
+                }
+                onClick={() => {
+                    navigate('/');
+                }}
+                sx={{
+                    p: 0,
+                    'font-size': 'xx-large',
+                    color: 'white',
+                    'paint-order': 'stroke fill',
+                    '-webkit-text-stroke': '4px #333',
+                    '&:hover': {
+                        backgroundColor: 'transparent',
+                        textDecoration: 'underline',
+                    },
+                }}
+            >
+                Custom Games
+            </Button>
 
             <Grid
                 container
@@ -76,7 +148,7 @@ export default function GameSettings() {
                 }}
             >
                 {/* Add Game Card */}
-                <Grid size="grow">
+                <Grid>
                     <Card
                         variant="outlined"
                         onClick={() => setShowModal(true)}
@@ -96,7 +168,7 @@ export default function GameSettings() {
                 {/* Display each game as a hero image card */}
                 {games.map((game, index) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <Grid key={index} size="grow">
+                    <Grid key={index}>
                         <Card
                             variant="outlined"
                             sx={{ height: 200, p: 0, overflow: 'hidden' }}
@@ -124,11 +196,13 @@ export default function GameSettings() {
                                     color="danger"
                                     variant="solid"
                                     size="sm"
-                                    onClick={() =>
+                                    onClick={() => {
+                                        // eslint-disable-next-line no-underscore-dangle
+                                        removeGame(game._id);
                                         setGames((prev) =>
                                             prev.filter((_, i) => i !== index),
-                                        )
-                                    }
+                                        );
+                                    }}
                                     sx={{
                                         position: 'absolute',
                                         top: 5,
@@ -140,7 +214,9 @@ export default function GameSettings() {
                                 >
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>
-                                <Typography level="h5">{game.name}</Typography>
+                                <Typography level="h4" sx={{ color: 'white' }}>
+                                    {game.name}
+                                </Typography>
                             </CardContent>
                         </Card>
                     </Grid>
@@ -192,6 +268,15 @@ export default function GameSettings() {
                     </Box>
                 </Card>
             </Modal>
+            <Snackbar
+                variant="soft"
+                color="danger"
+                open={errorOpen}
+                onClose={() => setErrorOpen(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Typography level="body-sm">{errorMessage}</Typography>
+            </Snackbar>
         </Box>
     );
 }

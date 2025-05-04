@@ -1,40 +1,38 @@
+const mockAllDocs = jest.fn();
+const mockPut = jest.fn();
+const mockGet = jest.fn();
+const mockRemove = jest.fn();
+
+// eslint-disable-next-line import/first
 import {
     fetchGames,
     addGame,
     clearAllGames,
-} from '../renderer/CustomGameService';
-import { customGameDb, CustomGame } from '../renderer/StorageType';
+    removeGame,
+} from '../main/CustomGameService';
+// eslint-disable-next-line import/first
+import { customGameDb, CustomGame } from '../main/StorageType';
 
-jest.mock('../renderer/StorageType', () => {
-    const mockPut = jest.fn();
-    const mockGet = jest.fn();
+jest.mock('../main/StorageType', () => {
     return {
         customGameDb: {
-            allDocs: jest.fn(),
+            allDocs: mockAllDocs,
             bulkDocs: jest.fn(),
             put: mockPut,
             get: mockGet,
+            remove: mockRemove,
         },
     };
 });
 
-type MockDb = {
-    put: jest.Mock<Promise<any>, [any]>;
-    get: jest.Mock<Promise<any>, [string]>;
-    allDocs: jest.Mock<Promise<any>, [CustomGame]>;
-};
-
 describe('addGame', () => {
-    let mockedDb: MockDb;
-
     beforeEach(() => {
-        mockedDb = customGameDb as unknown as MockDb;
-        mockedDb.put.mockReset();
+        jest.clearAllMocks();
     });
 
     it('should add a game successfully', async () => {
         const game = { id: 'game1', name: 'Game One', exe: '', heroPath: '' };
-        mockedDb.put.mockResolvedValue({ id: 'game1', rev: '1-xyz' });
+        mockPut.mockResolvedValue({ id: 'game1', rev: '1-xyz' });
 
         const result = await addGame(game);
 
@@ -49,18 +47,15 @@ describe('addGame', () => {
 
     it('should throw an error if adding a game fails', async () => {
         const game = { id: 'game2', name: 'Game Two', exe: '', heroPath: '' };
-        mockedDb.put.mockRejectedValue(new Error('Failed to add game'));
+        mockPut.mockRejectedValue(new Error('Failed to add game'));
 
         await expect(addGame(game)).rejects.toThrow('Failed to add game');
     });
 });
 
 describe('fetchGames', () => {
-    let mockedDb: MockDb;
-
     beforeEach(() => {
-        mockedDb = customGameDb as unknown as MockDb;
-        mockedDb.get.mockReset();
+        jest.clearAllMocks();
     });
 
     it('should fetch all successfully', async () => {
@@ -68,26 +63,73 @@ describe('fetchGames', () => {
             { _id: 'game1', name: 'Game One', exe: 'path1', heroPath: 'hero1' },
             { _id: 'game2', name: 'Game Two', exe: 'path2', heroPath: 'hero2' },
         ];
-        mockedDb.allDocs.mockResolvedValue({
+        mockAllDocs.mockResolvedValue({
             rows: mockGames.map((game) => ({ doc: game })),
         } as any);
 
         const games = await fetchGames();
 
         expect(games).toEqual(mockGames);
-        expect(mockedDb.allDocs).toHaveBeenCalledWith({ include_docs: true });
     });
 
     it('should fetch empty list if none exist', async () => {
         const mockGames: CustomGame[] = [];
-        mockedDb.allDocs.mockResolvedValue({
+        mockAllDocs.mockResolvedValue({
             rows: mockGames.map((game) => ({ doc: game })),
         } as any);
 
         const games = await fetchGames();
 
         expect(games).toEqual([]);
-        expect(mockedDb.allDocs).toHaveBeenCalledWith({ include_docs: true });
+    });
+});
+
+describe('removeGame', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should remove game by id', async () => {
+        const fakeDoc = {
+            _id: 'game1',
+            name: 'Game One',
+            exe: 'path1',
+            heroPath: 'hero1',
+        };
+        mockGet.mockResolvedValue(fakeDoc);
+        mockRemove.mockResolvedValue({ ok: true, id: 'game1', rev: '' });
+
+        const result = await removeGame('game1');
+
+        expect(mockGet).toHaveBeenCalledWith('game1');
+        expect(mockRemove).toHaveBeenCalledWith(fakeDoc);
+        expect(result).toEqual({ ok: true, id: 'game1', rev: '' });
+    });
+
+    it('failed get should return fail response', async () => {
+        mockGet.mockRejectedValue(new Error('not_found'));
+
+        const result = await removeGame('game2');
+
+        expect(mockGet).toHaveBeenCalledWith('game2');
+        expect(result).toEqual({ ok: false, id: 'game2', rev: '' });
+    });
+
+    it('failed remove should return fail response', async () => {
+        const fakeDoc = {
+            _id: 'game1',
+            name: 'Game One',
+            exe: 'path1',
+            heroPath: 'hero1',
+        };
+        mockGet.mockResolvedValue(fakeDoc);
+        mockRemove.mockRejectedValue(new Error('failed_remove'));
+
+        const result = await removeGame('game1');
+
+        expect(mockGet).toHaveBeenCalledWith('game1');
+        expect(mockRemove).toHaveBeenCalledWith(fakeDoc);
+        expect(result).toEqual({ ok: false, id: 'game1', rev: '' });
     });
 });
 

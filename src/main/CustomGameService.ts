@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { customGameDb, CustomGame } from './StorageType';
+import log from 'electron-log/renderer';
+import { customGameDb, CustomGame, Response } from './StorageType';
 
 export const addGame = async (
     game: Omit<CustomGame, '_id'> & { id: string },
@@ -12,6 +13,25 @@ export const addGame = async (
     };
 
     return customGameDb.put(doc);
+};
+
+export const removeGame = async (id: string): Promise<Response> => {
+    try {
+        const doc = await customGameDb.get(id);
+        const result = customGameDb.remove(doc);
+        return {
+            ok: (await result).ok,
+            id: (await result).id,
+            rev: (await result).rev,
+        };
+    } catch (error) {
+        log.error(`Failed to remove ${id}: `, error);
+        return {
+            ok: false,
+            id,
+            rev: '',
+        };
+    }
 };
 
 export const clearAllGames = async () => {

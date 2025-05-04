@@ -29,6 +29,7 @@ import ExampleChannel from '../ipc/ExampleChannel';
 import GameLibraryChannel from '../ipc/GameLibraryChannel';
 import OpenFileChannel from '../ipc/OpenFileChannel';
 import NavigateChannel from '../ipc/NavigateChannel';
+import CustomGamesChannel from '../ipc/CustomGamesChannel';
 
 log.initialize();
 
@@ -91,7 +92,6 @@ class Main {
         app.whenReady().then(() => {
             protocol.handle('steamimages', (request) => {
                 const filePath = request.url.slice('steamimages://'.length);
-                console.log(filePath);
                 // TODO: Get this path from settings
                 return net.fetch(
                     `C:\\Program Files (x86)\\Steam\\appcache\\${filePath}`,
@@ -99,12 +99,10 @@ class Main {
             });
             protocol.handle('local', (request) => {
                 const filePath = request.url.slice('local://'.length);
-                console.log(filePath);
                 const url = filePath.replace(
                     /^[a-z]\//,
                     (match) => `${match[0].toUpperCase()}:/`,
                 );
-                console.log(url);
                 return net.fetch(url);
             });
         });
@@ -228,4 +226,5 @@ new Main().init([
     new GameLibraryChannel(),
     new OpenFileChannel(),
     new NavigateChannel(),
+    new CustomGamesChannel(),
 ]);

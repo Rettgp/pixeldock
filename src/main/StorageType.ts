@@ -7,4 +7,10 @@ export type CustomGame = {
     heroPath: string;
 };
 
+export type Response = {
+    ok: boolean;
+    id: string;
+    rev: string;
+};
+
 export const customGameDb = new PouchDB<CustomGame>('custom-games');
