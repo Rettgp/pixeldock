@@ -1,6 +1,6 @@
 import './GameButton.css';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import IpcService from '../../ipc/IpcService';
 import { Runnable } from '../../main/types';
 
