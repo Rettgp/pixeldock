@@ -36,7 +36,7 @@ export const removeGame = async (id: string): Promise<Response> => {
 
 export const clearAllGames = async () => {
     const allDocs = await customGameDb.allDocs({ include_docs: true });
-    const deletions = allDocs.rows.map((row) => ({
+    const deletions = allDocs.rows.map((row: any) => ({
         _id: row.id,
         _rev: row.value.rev,
         _deleted: true,
@@ -50,6 +50,6 @@ export const clearAllGames = async () => {
 // Fetch all games
 export const fetchGames = async (): Promise<CustomGame[]> => {
     const result = await customGameDb.allDocs({ include_docs: true });
-    const games = result.rows.map((row) => row.doc!).filter(Boolean);
+    const games = result.rows.map((row: any) => row.doc!).filter(Boolean);
     return games!;
 };

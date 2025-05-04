@@ -13,6 +13,12 @@ import {
 // eslint-disable-next-line import/first
 import { customGameDb, CustomGame } from '../main/StorageType';
 
+jest.mock('pouchdb', () => {
+    return {
+        PouchDB: {},
+    };
+});
+
 jest.mock('../main/StorageType', () => {
     return {
         customGameDb: {
