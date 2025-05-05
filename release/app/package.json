@@ -1,12 +1,12 @@
 {
-  "name": "game-launch",
+  "name": "pixeldock",
   "version": "0.2.1",
   "description": "A game launcher designed to be an overlay for desktops",
   "license": "MIT",
   "author": {
     "name": "Garrett Phelps",
     "email": "garrphelps@gmail.com",
-    "url": "https://github.com/rettgp/game-launch"
+    "url": "https://github.com/rettgp/pixeldock"
   },
   "main": "./dist/main/main.js",
   "scripts": {

@@ -1,5 +1,5 @@
 {
-  "name": "game-launch",
+  "name": "pixeldock",
   "description": "A game launcher designed to be an overlay for desktops",
   "keywords": [
     "electron",
@@ -12,13 +12,13 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/Rettgp/game-launch#readme",
+  "homepage": "https://github.com/Rettgp/pixeldock#readme",
   "bugs": {
-    "url": "https://github.com/Rettgp/game-launch/issues"
+    "url": "https://github.com/Rettgp/pixeldock/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Rettgp/game-launch.git"
+    "url": "git+https://github.com/Rettgp/pixeldock.git"
   },
   "license": "MIT",
   "author": {
@@ -184,8 +184,8 @@
     "webpack-merge": "^6.0.1"
   },
   "build": {
-    "productName": "GameLaunch",
-    "appId": "org.rettgp.GameLaunch",
+    "productName": "PixelDock",
+    "appId": "org.rettgp.PixelDock",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -246,7 +246,7 @@
       "provider": "github",
       "releaseType": "release",
       "owner": "rettgp",
-      "repo": "game-launch"
+      "repo": "pixeldock"
     }
   },
   "devEngines": {

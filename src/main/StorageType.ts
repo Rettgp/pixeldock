@@ -16,5 +16,5 @@ export type Response = {
 };
 
 export const customGameDb = new PouchDB<CustomGame>(
-    path.join(app.getPath('appData'), 'game-launch-db', 'custom-games'),
+    path.join(app.getPath('appData'), 'pixeldock-db', 'custom-games'),
 );
