@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   sodipodi:docname="pixeldock_logo.svg"
+   xml:space="preserve"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="0.81249999"
+     inkscape:cx="48.000001"
+     inkscape:cy="278.76924"
+     inkscape:window-width="1728"
+     inkscape:window-height="978"
+     inkscape:window-x="0"
+     inkscape:window-y="38"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1"
+     showgrid="true"><inkscape:grid
+       id="grid11"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" /></sodipodi:namedview><defs
+     id="defs1"><rect
+       x="79.19596"
+       y="388.14723"
+       width="344.63297"
+       height="88.769098"
+       id="rect1" /></defs><g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1" /><g
+     id="g16"
+     transform="translate(0,-6.3502824)"><text
+       xml:space="preserve"
+       id="text1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.9566px;font-family:Montserrat;-inkscape-font-specification:'Montserrat, @wght=700';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;font-variation-settings:'wght' 700;text-align:start;letter-spacing:-1.16933px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect1);fill:#3cb371;fill-opacity:1"
+       transform="matrix(4.6553704,0,0,5.7078404,-339.82009,-1946.3273)"><tspan
+         x="79.195312"
+         y="406.48847"
+         id="tspan1">
+</tspan><tspan
+         x="79.195312"
+         y="431.43421"
+         id="tspan5">PixelDock
+</tspan></text><g
+       id="g15"
+       transform="matrix(1.2055403,0,0,1.2055403,-50.207236,-64.773417)"><path
+         style="font-variation-settings:'wght' 600;fill:#3cb371"
+         d="m 232,60 v 23 h 44 V 60 Z"
+         id="path12" /><path
+         style="font-variation-settings:'wght' 600;fill:#3cb371"
+         d="m 210,83 v 41 h 22 V 83 Z"
+         id="path13" /><path
+         style="font-variation-settings:'wght' 600;fill:#3cb371"
+         d="m 276,83 v 41 h 22 V 83 Z"
+         id="path14" /><path
+         style="font-variation-settings:'wght' 600;fill:#3cb371"
+         d="m 232,124 v 22 h 22 v 24 h -67 v 23 h 45 v 132 h -44 v -21 h -22 v -44 h -22 v -22 h -23 v 65 h 22 v 22 h 22 v 23 h 22 v 23 h 45 v 22 h 44 v -22 h 44 v -23 h 22 v -22 h 23 v -23 h 22 v -65 h -22 c 0,0 0,22 0,22 h -23 v 43 h -22 v 22 H 276 V 193 h 44 v -23 h -44 v -46 z"
+         id="path15" /></g></g></svg>
