@@ -1,8 +1,6 @@
 <div align="center">
   <!-- Placeholder Logo -->
-  <img src="https://via.placeholder.com/150x150.png?text=Logo" alt="App Logo" width="150"/>
-
-  <h1>PixelDock</h1>
+  <img src="assets/icons/1024x1024.png" alt="PixelDock Logo" width="256"/>
 
   <p><em>A sleek and unified desktop launcher for all your games — Steam and beyond.</em></p>
 
