@@ -113,7 +113,7 @@ export default function GameSettings() {
     }, []);
 
     return (
-        <Box p={2}>
+        <>
             <Button
                 variant="plain"
                 startDecorator={
@@ -132,6 +132,7 @@ export default function GameSettings() {
                         backgroundColor: 'transparent',
                         textDecoration: 'underline',
                     },
+                    paddingBottom: '1rem',
                 }}
             >
                 Custom Games
@@ -153,15 +154,18 @@ export default function GameSettings() {
                         variant="outlined"
                         onClick={() => setShowModal(true)}
                         sx={{
-                            border: '2px dashed grey',
+                            border: '2px dashed white',
                             height: '5rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             cursor: 'pointer',
+                            background: 'transparent',
                         }}
                     >
-                        <Typography level="h4">+ Add Game</Typography>
+                        <Typography level="h4" sx={{ color: 'white' }}>
+                            + Add Game
+                        </Typography>
                     </Card>
                 </Grid>
 
@@ -277,6 +281,6 @@ export default function GameSettings() {
             >
                 <Typography level="body-sm">{errorMessage}</Typography>
             </Snackbar>
-        </Box>
+        </>
     );
 }

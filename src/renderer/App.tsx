@@ -6,6 +6,7 @@ import IpcService from '../ipc/IpcService';
 import GameButton from './components/GameButton';
 import GameSettings from './components/GameSettings';
 import { IpcRequest } from '../ipc/IpcChannelInterface';
+import { Box } from '@mui/joy';
 
 export default function App() {
     const [data, setData] = useState<any[]>([]);
@@ -64,7 +65,17 @@ export default function App() {
                     <GameButton key={index} runnable={runnable} />
                 ))}
             />
-            <Route path="/game-settings" element={<GameSettings />} />
+            <Route
+                path="/game-settings"
+                element={
+                    <Box
+                        p={2}
+                        sx={{ backgroundColor: '#333', height: '100vh' }}
+                    >
+                        <GameSettings />
+                    </Box>
+                }
+            />
         </Routes>
     );
 }
