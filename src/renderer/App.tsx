@@ -2,12 +2,12 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 import { useEffect, useState } from 'react';
 import log from 'electron-log/renderer';
+import { Box } from '@mui/joy';
 import IpcService from '../ipc/IpcService';
 import GameButton from './components/GameButton';
 import GameSettings from './components/GameSettings';
 import SettingsPanel from './components/SettingsPanel';
 import { IpcRequest } from '../ipc/IpcChannelInterface';
-import { Box } from '@mui/joy';
 
 export default function App() {
     const [data, setData] = useState<any[]>([]);
