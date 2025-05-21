@@ -5,7 +5,7 @@ import log from 'electron-log/renderer';
 import IpcService from '../ipc/IpcService';
 import GameButton from './components/GameButton';
 import GameSettings from './components/GameSettings';
-import Settings from './components/Settings';
+import SettingsPanel from './components/SettingsPanel';
 import { IpcRequest } from '../ipc/IpcChannelInterface';
 import { Box } from '@mui/joy';
 
@@ -92,7 +92,7 @@ export default function App() {
                             width: '30vh',
                         }}
                     >
-                        <Settings />
+                        <SettingsPanel />
                     </Box>
                 }
             />

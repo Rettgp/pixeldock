@@ -30,6 +30,7 @@ import GameLibraryChannel from '../ipc/GameLibraryChannel';
 import OpenFileChannel from '../ipc/OpenFileChannel';
 import NavigateChannel from '../ipc/NavigateChannel';
 import CustomGamesChannel from '../ipc/CustomGamesChannel';
+import SettingsChannel from '../ipc/SettingsChannel';
 
 log.initialize();
 
@@ -169,6 +170,8 @@ class Main {
         };
 
         const display = screen.getPrimaryDisplay();
+        console.log(screen.getAllDisplays());
+        console.log(screen.getAllDisplays());
         const factor = display.scaleFactor;
         const monitorHeight = display.size.height;
         const preferredWidth = 500;
@@ -237,4 +240,5 @@ new Main().init([
     new OpenFileChannel(),
     new NavigateChannel(),
     new CustomGamesChannel(),
+    new SettingsChannel(),
 ]);

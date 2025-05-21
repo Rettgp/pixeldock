@@ -9,6 +9,12 @@ export type CustomGame = {
     heroPath: string;
 };
 
+export type Settings = {
+    _id: string;
+    _rev?: string;
+    display: number;
+};
+
 export type Response = {
     ok: boolean;
     id: string;
@@ -17,4 +23,8 @@ export type Response = {
 
 export const customGameDb = new PouchDB<CustomGame>(
     path.join(app.getPath('appData'), 'pixeldock-db', 'custom-games'),
+);
+
+export const settingsDb = new PouchDB<Settings>(
+    path.join(app.getPath('appData'), 'pixeldock-db', 'settings'),
 );
