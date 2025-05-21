@@ -5,6 +5,7 @@ import log from 'electron-log/renderer';
 import IpcService from '../ipc/IpcService';
 import GameButton from './components/GameButton';
 import GameSettings from './components/GameSettings';
+import Settings from './components/Settings';
 import { IpcRequest } from '../ipc/IpcChannelInterface';
 import { Box } from '@mui/joy';
 
@@ -70,9 +71,28 @@ export default function App() {
                 element={
                     <Box
                         p={2}
-                        sx={{ backgroundColor: '#333', height: '100vh' }}
+                        sx={{
+                            backgroundColor: '#333',
+                            height: '100vh',
+                            width: '30vh',
+                        }}
                     >
                         <GameSettings />
+                    </Box>
+                }
+            />
+            <Route
+                path="/settings"
+                element={
+                    <Box
+                        p={2}
+                        sx={{
+                            backgroundColor: '#333',
+                            height: '100vh',
+                            width: '30vh',
+                        }}
+                    >
+                        <Settings />
                     </Box>
                 }
             />

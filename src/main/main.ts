@@ -142,6 +142,10 @@ class Main {
         const tray = new Tray(this.getAssetPath('icon.png'));
         const contextMenu = Menu.buildFromTemplate([
             {
+                label: 'Settings',
+                click: () => this.navigate('settings'),
+            },
+            {
                 label: 'Games',
                 click: () => this.navigate('game-settings'),
             },
