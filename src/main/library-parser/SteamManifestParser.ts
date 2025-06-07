@@ -66,7 +66,7 @@ export function parseManifest(path: string): SteamGame {
     try {
         content = fs.readFileSync(path, 'utf-8');
     } catch (e: any) {
-        log.error(`Manifest file not found : ${e.message}`);
+        log.warn(`Manifest file not found : ${e.message}`);
         return { appid: '0', name: 'UNKNOWN', installed: false } as SteamGame;
     }
 

@@ -2,12 +2,13 @@ import { Button } from '@mui/joy';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import log from 'electron-log/renderer';
 import { Settings } from '../../main/StorageType';
 import IpcService from '../../ipc/IpcService';
 
 export default function SettingsPanel() {
     const navigate = useNavigate();
-    const [settings, setSettings] = useState<Settings>();
+    const [, setSettings] = useState<Settings>();
 
     const fetchSettings = async () => {
         const ipc = new IpcService();
@@ -19,7 +20,7 @@ export default function SettingsPanel() {
                 return fetchedSettings;
             })
             .catch((error) => {
-                console.log(error);
+                log.error(error);
             });
     };
 
