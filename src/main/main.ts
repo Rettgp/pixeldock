@@ -1,14 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build:main`, this file is compiled to
- * `./src/main.js` using webpack. This gives us some performance wins.
- */
 import path from 'path';
 import {
     app,
@@ -20,6 +12,7 @@ import {
     net,
     Tray,
     Menu,
+    Display,
 } from 'electron';
 import log from 'electron-log/main';
 import MenuBuilder from './menu';
@@ -154,6 +147,33 @@ class Main {
         tray.setContextMenu(contextMenu);
     }
 
+    private createMonitorContextMenu(positioner: (display: Display) => void) {
+        this.mainWindow!.webContents.on('context-menu', () => {
+            const displays = screen.getAllDisplays();
+            const menuItems = displays.map((display, index) => ({
+                label: `Monitor ${index + 1}`,
+                click: () => {
+                    const win = this.mainWindow;
+                    if (win) {
+                        positioner(display);
+                    }
+                },
+            }));
+
+            const menu = Menu.buildFromTemplate(menuItems);
+            menu.popup({ window: this.mainWindow! });
+        });
+    }
+
+    private positionWindow(display: Display) {
+        const factor = display.scaleFactor;
+        const preferredWidth = 500;
+        this.mainWindow!.setPosition(
+            display.size.width - preferredWidth / factor + display.bounds.x,
+            0,
+        );
+    }
+
     private async createWindow() {
         if (isDebug) {
             await installExtensions();
@@ -168,8 +188,6 @@ class Main {
         };
 
         const display = screen.getPrimaryDisplay();
-        console.log(screen.getAllDisplays());
-        console.log(screen.getAllDisplays());
         const factor = display.scaleFactor;
         const monitorHeight = display.size.height;
         const preferredWidth = 500;
@@ -191,10 +209,7 @@ class Main {
             },
             alwaysOnTop: false,
         });
-        this.mainWindow.setPosition(
-            display.size.width - preferredWidth / factor,
-            0,
-        );
+        this.positionWindow(display);
 
         this.mainWindow.loadFile('../../index.html');
 
@@ -220,6 +235,23 @@ class Main {
         this.mainWindow.webContents.setWindowOpenHandler((edata) => {
             shell.openExternal(edata.url);
             return { action: 'deny' };
+        });
+
+        this.createMonitorContextMenu();
+        this.mainWindow!.webContents.on('context-menu', () => {
+            const displays = screen.getAllDisplays();
+            const menuItems = displays.map((possibleDisplay, index) => ({
+                label: `Monitor ${index + 1}`,
+                click: () => {
+                    const win = this.mainWindow;
+                    if (win) {
+                        this.positionWindow(possibleDisplay);
+                    }
+                },
+            }));
+
+            const menu = Menu.buildFromTemplate(menuItems);
+            menu.popup({ window: this.mainWindow! });
         });
     }
 
