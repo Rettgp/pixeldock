@@ -147,24 +147,6 @@ class Main {
         tray.setContextMenu(contextMenu);
     }
 
-    private createMonitorContextMenu(positioner: (display: Display) => void) {
-        this.mainWindow!.webContents.on('context-menu', () => {
-            const displays = screen.getAllDisplays();
-            const menuItems = displays.map((display, index) => ({
-                label: `Monitor ${index + 1}`,
-                click: () => {
-                    const win = this.mainWindow;
-                    if (win) {
-                        positioner(display);
-                    }
-                },
-            }));
-
-            const menu = Menu.buildFromTemplate(menuItems);
-            menu.popup({ window: this.mainWindow! });
-        });
-    }
-
     private positionWindow(display: Display) {
         const factor = display.scaleFactor;
         const preferredWidth = 500;
@@ -235,23 +217,6 @@ class Main {
         this.mainWindow.webContents.setWindowOpenHandler((edata) => {
             shell.openExternal(edata.url);
             return { action: 'deny' };
-        });
-
-        this.createMonitorContextMenu();
-        this.mainWindow!.webContents.on('context-menu', () => {
-            const displays = screen.getAllDisplays();
-            const menuItems = displays.map((possibleDisplay, index) => ({
-                label: `Monitor ${index + 1}`,
-                click: () => {
-                    const win = this.mainWindow;
-                    if (win) {
-                        this.positionWindow(possibleDisplay);
-                    }
-                },
-            }));
-
-            const menu = Menu.buildFromTemplate(menuItems);
-            menu.popup({ window: this.mainWindow! });
         });
     }
 
