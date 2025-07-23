@@ -27,7 +27,7 @@
 
 <!-- Replace this with a real gif later -->
 <p align="center">
-  <img src="https://via.placeholder.com/600x300.gif?text=Demo+GIF+Goes+Here" alt="App Demo">
+  <img src="./demo.gif" alt="App Demo">
 </p>
 
 ---
