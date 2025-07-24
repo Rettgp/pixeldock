@@ -21,10 +21,14 @@ export type Response = {
     rev: string;
 };
 
-export const customGameDb = new PouchDB<CustomGame>(
-    path.join(app.getPath('appData'), 'pixeldock-db', 'custom-games'),
-);
+export const createCustomGameDb = (customPath: string = path.join(app.getPath('appData'), 'pixeldock-db', 'custom-games')) => {
+    return new PouchDB<CustomGame>(
+        path.join(customPath),
+    );
+};
 
-export const settingsDb = new PouchDB<Settings>(
-    path.join(app.getPath('appData'), 'pixeldock-db', 'settings'),
-);
+export const createSettingsDb = (customPath: string = path.join(app.getPath('appData'), 'pixeldock-db', 'settings')) => {
+    return new PouchDB<Settings>(
+        path.join(customPath),
+    );
+};

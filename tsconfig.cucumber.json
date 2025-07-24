@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2020",
+    "moduleResolution": "node",
+    "outDir": "./.cucumber-ts-build",
+    "allowJs": false,
+    "noEmit": true
+  },
+  "include": ["features/**/*.ts"]
+}
