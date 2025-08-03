@@ -1,5 +1,4 @@
 import { IpcMainEvent } from 'electron';
-import log from 'electron-log/renderer';
 import { IpcChannelInterface, IpcRequest } from './IpcChannelInterface';
 import SteamLibrary from '../main/library-parser/SteamLibrary';
 import spawnGame from '../process/spawnGame';

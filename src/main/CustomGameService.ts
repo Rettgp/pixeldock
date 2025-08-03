@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import log from 'electron-log/renderer';
+import PouchDB from 'pouchdb';
 import { CustomGame } from './StorageType';
 
 export default class StorageService {

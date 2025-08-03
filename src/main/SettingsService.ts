@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import log from 'electron-log/renderer';
+import PouchDB from 'pouchdb';
 import { Settings, Response } from './StorageType';
 
 export default class SettingsService {
