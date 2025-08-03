@@ -71,6 +71,7 @@ export default function App() {
                 element={
                     <Box
                         p={2}
+                        paddingTop={5}
                         sx={{
                             backgroundColor: '#333',
                             height: '100vh',
@@ -86,6 +87,7 @@ export default function App() {
                 element={
                     <Box
                         p={2}
+                        paddingTop={5}
                         sx={{
                             backgroundColor: '#333',
                             height: '100vh',
