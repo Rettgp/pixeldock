@@ -1,11 +1,12 @@
 import { IpcMainEvent } from 'electron';
 import log from 'electron-log/renderer';
 import { IpcChannelInterface, IpcRequest } from './IpcChannelInterface';
-import { StorageService } from '../main/CustomGameService';
+import StorageService from '../main/CustomGameService';
 import { createCustomGameDb } from '../main/StorageType';
 
 export default class CustomGamesChannel implements IpcChannelInterface {
     static name: string = 'custom-games';
+
     storageService: StorageService = new StorageService(createCustomGameDb());
 
     getName(): string {
@@ -21,7 +22,8 @@ export default class CustomGamesChannel implements IpcChannelInterface {
         }
 
         if (request.params![0] === 'fetch') {
-            this.storageService.fetchGames()
+            this.storageService
+                .fetchGames()
                 .then((games) => {
                     event.reply(request.responseChannel!, games);
                     return games;
@@ -40,7 +42,8 @@ export default class CustomGamesChannel implements IpcChannelInterface {
                 exe: gameJson.exe,
                 heroPath: gameJson.heroPath,
             };
-            this.storageService.addGame(game)
+            this.storageService
+                .addGame(game)
                 .then((result) => {
                     event.reply(request.responseChannel!, result);
                     return result;
@@ -52,7 +55,8 @@ export default class CustomGamesChannel implements IpcChannelInterface {
 
         if (request.params![0] === 'remove') {
             const id = request.params![1];
-            this.storageService.removeGame(id)
+            this.storageService
+                .removeGame(id)
                 .then((result) => {
                     return result;
                 })

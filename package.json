@@ -49,7 +49,7 @@
     "start:main": "concurrently -k \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon .\"",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js"
+    "test": "cross-env TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js"
   },
   "browserslist": [
     "extends browserslist-config-erb"
@@ -110,7 +110,7 @@
     "electron-debug": "^4.1.0",
     "electron-log": "^5.3.4",
     "electron-updater": "^6.3.9",
-    "pouchdb": "^9.0.0",
+    "path-browserify": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0",
@@ -127,6 +127,7 @@
     "@types/jest": "^29.5.14",
     "@types/mock-fs": "^4.13.4",
     "@types/node": "22.13.10",
+    "@types/path-browserify": "^1.0.3",
     "@types/pouchdb": "^6.4.2",
     "@types/react": "^19.0.11",
     "@types/react-dom": "^19.0.4",
@@ -167,6 +168,7 @@
     "mini-css-extract-plugin": "^2.9.2",
     "mock-fs": "^5.5.0",
     "node-abi": "^4.6.0",
+    "pouchdb": "^9.0.0",
     "pouchdb-adapter-memory": "^9.0.0",
     "prettier": "^3.5.3",
     "react-refresh": "^0.16.0",

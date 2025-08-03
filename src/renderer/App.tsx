@@ -28,7 +28,7 @@ export default function App() {
                     return {
                         name: game.name,
                         appid: undefined,
-                        heroPath: `steamimages://${game.heroPath}`,
+                        heroPath: `steamimages://image/${game.heroPath}`,
                         exe: game.exe,
                     };
                 });
@@ -37,7 +37,7 @@ export default function App() {
                         if (runnable.heroPath.length === 0 && runnable.appid) {
                             return {
                                 ...runnable,
-                                heroPath: `steamimages://librarycache/${runnable.appid}/library_hero.jpg`,
+                                heroPath: `steamimages://image/${runnable.appid}/library_hero.jpg`,
                             };
                         }
 

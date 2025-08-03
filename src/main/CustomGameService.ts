@@ -2,18 +2,14 @@
 import log from 'electron-log/renderer';
 import { CustomGame } from './StorageType';
 
-export class StorageService {
+export default class StorageService {
     private customGameDb: PouchDB.Database<CustomGame>;
 
-    constructor(
-        customGameDb: PouchDB.Database<CustomGame>,
-    ) {
+    constructor(customGameDb: PouchDB.Database<CustomGame>) {
         this.customGameDb = customGameDb;
     }
 
-    addGame = async (
-        game: Omit<CustomGame, '_id'> & { id: string },
-    ) => {
+    addGame = async (game: Omit<CustomGame, '_id'> & { id: string }) => {
         const doc: CustomGame = {
             _id: game.id,
             name: game.name,
@@ -24,7 +20,9 @@ export class StorageService {
         return this.customGameDb.put(doc);
     };
 
-    removeGame = async (id: string): Promise<{ ok: boolean; id: string; rev: string }> => {
+    removeGame = async (
+        id: string,
+    ): Promise<{ ok: boolean; id: string; rev: string }> => {
         try {
             const doc = await this.customGameDb.get(id);
             const result = await this.customGameDb.remove(doc);

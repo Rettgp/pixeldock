@@ -14,8 +14,19 @@ export default class OpenFileChannel implements IpcChannelInterface {
             request.responseChannel = `${this.getName()}_response`;
         }
 
+        if (!request.params) {
+            return;
+        }
+
+        const mode = request.params![0];
+        if (mode !== 'openFile' && mode !== 'openDirectory') {
+            log.error(`Invalid mode: ${mode}`);
+            event.reply(request.responseChannel!, null);
+            return;
+        }
+
         const dialogPromise = dialog.showOpenDialog({
-            properties: ['openFile'],
+            properties: [mode],
         });
 
         dialogPromise

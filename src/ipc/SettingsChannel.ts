@@ -1,12 +1,22 @@
 import { IpcMainEvent } from 'electron';
 import log from 'electron-log/renderer';
 import { IpcChannelInterface, IpcRequest } from './IpcChannelInterface';
-import { SettingsService } from '../main/SettingsService';
+import SettingsService from '../main/SettingsService';
 import { createSettingsDb } from '../main/StorageType';
 
 export default class SettingsChannel implements IpcChannelInterface {
     static name: string = 'settings';
-    settingsService: SettingsService = new SettingsService(createSettingsDb());
+
+    private settingsService: SettingsService;
+
+    constructor();
+
+    constructor(settingsService: SettingsService);
+
+    constructor(settingsService?: SettingsService) {
+        this.settingsService =
+            settingsService ?? new SettingsService(createSettingsDb());
+    }
 
     getName(): string {
         return SettingsChannel.name;
@@ -21,7 +31,8 @@ export default class SettingsChannel implements IpcChannelInterface {
         }
 
         if (request.params![0] === 'fetch') {
-            this.settingsService.fetchSettings()
+            this.settingsService
+                .fetchSettings()
                 .then((settings) => {
                     event.reply(request.responseChannel!, settings);
                     return settings;
@@ -37,8 +48,11 @@ export default class SettingsChannel implements IpcChannelInterface {
                 // eslint-disable-next-line no-underscore-dangle
                 id: settingsJson._id,
                 display: settingsJson.display,
+                steamLibraryCache: settingsJson.steamLibraryCache,
+                steamGamesLibrary: settingsJson.steamGamesLibrary,
             };
-            this.settingsService.saveSettings(settings)
+            this.settingsService
+                .saveSettings(settings)
                 .then((result) => {
                     event.reply(request.responseChannel!, result);
 

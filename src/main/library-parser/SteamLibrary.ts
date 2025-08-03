@@ -6,13 +6,13 @@ import { parseManifest } from './SteamManifestParser';
 import { Runnable, LibraryConnector } from '../types';
 
 export default class SteamLibrary implements LibraryConnector {
-    getGames(directory: string): Runnable[] {
+    getGames(appDirectory: string, imageDirectory: string = ''): Runnable[] {
         let manifestPaths = [];
         try {
             manifestPaths = fs
-                .readdirSync(directory)
+                .readdirSync(appDirectory)
                 .filter((file) => file.endsWith('.acf'))
-                .map((file) => path.join(directory, file));
+                .map((file) => path.join(appDirectory, file));
         } catch (error) {
             log.error('SteamLibrary : Error reading directory:', error);
             return [];
@@ -33,16 +33,14 @@ export default class SteamLibrary implements LibraryConnector {
                 return {
                     name: game.name,
                     appid: game.appid,
-                    heroPath: this.findHeroPath(game.appid),
+                    heroPath: this.findHeroPath(imageDirectory, game.appid),
                     exe: `steam://rungameid/${game.appid}`,
                 } as Runnable;
             });
     }
 
-    findHeroPath(appid: string): string {
-        // TODO: Get this path from settings
-        const basePath =
-            'C:\\Program Files (x86)\\Steam\\appcache\\librarycache';
+    findHeroPath(directory: string, appid: string): string {
+        const basePath = directory;
         const rootDir = path.join(basePath, appid);
 
         try {
@@ -54,9 +52,9 @@ export default class SteamLibrary implements LibraryConnector {
             if (inRoot) {
                 path.join(basePath, appid);
                 let heroPath = path
-                    .join('librarycache', appid, inRoot.name)
+                    .join(appid, inRoot.name)
                     .replace(/\\/g, '/');
-                heroPath = `steamimages://${heroPath}`;
+                heroPath = `steamimages://image/${heroPath}`;
                 return heroPath;
             }
 
@@ -70,19 +68,14 @@ export default class SteamLibrary implements LibraryConnector {
                     );
                     if (fs.existsSync(subPath)) {
                         return path
-                            .join(
-                                'librarycache',
-                                appid,
-                                dir.name,
-                                'library_hero.jpg',
-                            )
+                            .join(appid, dir.name, 'library_hero.jpg')
                             .replace(/\\/g, '/');
                     }
                     return null;
                 })
                 .find(Boolean);
 
-            const heroPath = inSubdir ? `steamimages://${inSubdir}` : '';
+            const heroPath = inSubdir ? `steamimages://image/${inSubdir}` : '';
             return heroPath;
         } catch (e: any) {
             log.warn(`Error finding library_hero: ${e.message}`);

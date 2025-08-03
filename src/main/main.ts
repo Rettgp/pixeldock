@@ -24,6 +24,8 @@ import OpenFileChannel from '../ipc/OpenFileChannel';
 import NavigateChannel from '../ipc/NavigateChannel';
 import CustomGamesChannel from '../ipc/CustomGamesChannel';
 import SettingsChannel from '../ipc/SettingsChannel';
+import SettingsService from './SettingsService';
+import { createSettingsDb } from './StorageType';
 
 log.initialize();
 
@@ -50,6 +52,10 @@ const installExtensions = async () => {
         )
         .catch(console.log);
 };
+
+const settingsService: SettingsService = new SettingsService(
+    createSettingsDb(),
+);
 
 class Main {
     private mainWindow: BrowserWindow | undefined;
@@ -84,11 +90,14 @@ class Main {
         ]);
         // eslint-disable-next-line promise/catch-or-return
         app.whenReady().then(() => {
-            protocol.handle('steamimages', (request) => {
-                const filePath = request.url.slice('steamimages://'.length);
-                // TODO: Get this path from settings
+            protocol.handle('steamimages', async (request) => {
+                const settings = await settingsService.fetchSettings();
+
+                const filePath = request.url.slice(
+                    'steamimages://image/'.length,
+                );
                 return net.fetch(
-                    `C:\\Program Files (x86)\\Steam\\appcache\\${filePath}`,
+                    path.join(settings.steamLibraryCache, filePath),
                 );
             });
             protocol.handle('local', (request) => {
@@ -231,9 +240,9 @@ class Main {
 
 new Main().init([
     new ExampleChannel(),
-    new GameLibraryChannel(),
+    new GameLibraryChannel(settingsService),
     new OpenFileChannel(),
     new NavigateChannel(),
     new CustomGamesChannel(),
-    new SettingsChannel(),
+    new SettingsChannel(settingsService),
 ]);

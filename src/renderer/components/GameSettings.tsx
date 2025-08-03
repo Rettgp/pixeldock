@@ -21,7 +21,9 @@ import IpcService from '../../ipc/IpcService';
 
 const openFileBrowser = (): Promise<string> => {
     const ipc = new IpcService();
-    return ipc.send<string>('open-file', {});
+    return ipc.send<string>('open-file', {
+        params: ['openFile'],
+    });
 };
 
 export default function GameSettings() {
@@ -70,9 +72,15 @@ export default function GameSettings() {
 
     const handleBrowse = async (field: keyof CustomGame) => {
         openFileBrowser()
-            .then((path) => {
-                if (path) {
-                    setFormData((prev) => ({ ...prev, [field]: path }));
+            .then((filePath) => {
+                if (filePath) {
+                    setFormData((prev) => ({
+                        ...prev,
+                        [field]:
+                            field === 'heroPath'
+                                ? filePath.split(/[/\\]/).pop() || ''
+                                : filePath,
+                    }));
                 }
                 return true;
             })
@@ -178,7 +186,7 @@ export default function GameSettings() {
                             sx={{ height: 200, p: 0, overflow: 'hidden' }}
                         >
                             <img
-                                src={`steamimages://${game.heroPath}`}
+                                src={`steamimages://image/${game.heroPath}`}
                                 alt={game.name}
                                 style={{
                                     width: '100%',

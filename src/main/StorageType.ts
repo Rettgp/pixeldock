@@ -13,6 +13,8 @@ export type Settings = {
     _id: string;
     _rev?: string;
     display: number;
+    steamLibraryCache: string;
+    steamGamesLibrary: string;
 };
 
 export type Response = {
@@ -21,14 +23,22 @@ export type Response = {
     rev: string;
 };
 
-export const createCustomGameDb = (customPath: string = path.join(app.getPath('appData'), 'pixeldock-db', 'custom-games')) => {
-    return new PouchDB<CustomGame>(
-        path.join(customPath),
-    );
+export const createCustomGameDb = (
+    customPath: string = path.join(
+        app.getPath('appData'),
+        'pixeldock-db',
+        'custom-games',
+    ),
+) => {
+    return new PouchDB<CustomGame>(path.join(customPath));
 };
 
-export const createSettingsDb = (customPath: string = path.join(app.getPath('appData'), 'pixeldock-db', 'settings')) => {
-    return new PouchDB<Settings>(
-        path.join(customPath),
-    );
+export const createSettingsDb = (
+    customPath: string = path.join(
+        app.getPath('appData'),
+        'pixeldock-db',
+        'settings',
+    ),
+) => {
+    return new PouchDB<Settings>(path.join(customPath));
 };
