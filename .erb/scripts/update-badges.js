@@ -7,11 +7,11 @@ const appPkgPath = path.join(__dirname, '../../release/app/package.json');
 const rootPkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf8'));
 const appPkg = JSON.parse(fs.readFileSync(appPkgPath, 'utf8'));
 
-const version = rootPkg.version;
+const { version } = rootPkg;
 
 // Sync version from root package.json into release/app/package.json
 appPkg.version = version;
-fs.writeFileSync(appPkgPath, JSON.stringify(appPkg, null, 2) + '\n');
+fs.writeFileSync(appPkgPath, `${JSON.stringify(appPkg, null, 2)}\n`);
 const react = rootPkg.dependencies.react.replace(/[\^~>=<]/g, '');
 const electron = rootPkg.devDependencies.electron.replace(/[\^~>=<]/g, '');
 

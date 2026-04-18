@@ -1,4 +1,5 @@
 import { screen, Menu, shell, BrowserWindow, Display } from 'electron';
+import log from 'electron-log/main';
 import SettingsService from './SettingsService';
 
 export default class MenuBuilder {
@@ -67,6 +68,7 @@ export default class MenuBuilder {
                                 const existing =
                                     await this.settingsService.fetchSettings();
                                 await this.settingsService.saveSettings({
+                                    // eslint-disable-next-line no-underscore-dangle
                                     id: existing._id ?? '0',
                                     display: possibleDisplay.id,
                                     steamLibraryCache:

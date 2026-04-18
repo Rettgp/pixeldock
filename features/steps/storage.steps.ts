@@ -188,6 +188,7 @@ When('I update the preferred monitor to {string}', async (monitor: string) => {
     const id = parseInt(monitor.replace('Monitor ', ''), 10);
     const existing = await settingsService.fetchSettings();
     await settingsService.saveSettings({
+        // eslint-disable-next-line no-underscore-dangle
         id: existing._id ?? '0',
         display: id,
         steamLibraryCache: existing.steamLibraryCache ?? '',
