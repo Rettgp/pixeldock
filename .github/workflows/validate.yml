@@ -17,9 +17,6 @@ jobs:
         os: [windows-latest, ubuntu-latest]
 
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v4
-
       - name: Run tests using reusable action
         uses: ./.github/actions/test
         with:
@@ -34,8 +31,5 @@ jobs:
       security-events: write
 
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v4
-
       - name: Run CodeQL analysis using reusable action
         uses: ./.github/actions/codeql
