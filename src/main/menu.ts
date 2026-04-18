@@ -1,5 +1,4 @@
 import { screen, Menu, shell, BrowserWindow, Display } from 'electron';
-import log from 'electron-log';
 import SettingsService from './SettingsService';
 
 export default class MenuBuilder {
