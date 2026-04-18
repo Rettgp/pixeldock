@@ -64,7 +64,6 @@ export default class MenuBuilder {
                     click: async () => {
                         const win = this.mainWindow;
                         if (win) {
-                            this.positionWindow(possibleDisplay);
                             try {
                                 const existing =
                                     await this.settingsService.fetchSettings();
@@ -77,9 +76,19 @@ export default class MenuBuilder {
                                         existing.steamGamesLibrary ?? '',
                                 });
                                 this.preferredDisplayId = possibleDisplay.id;
-                            } catch {
-                                // Keep the in-memory preferred display unchanged
-                                // if the settings cannot be persisted.
+                                this.positionWindow(possibleDisplay);
+                            } catch (error) {
+                                log.error(
+                                    'Failed to persist preferred display selection',
+                                    error,
+                                );
+                                // Restore the checked radio item so the menu UI
+                                // matches the unchanged preferred display.
+                                Menu.setApplicationMenu(
+                                    Menu.buildFromTemplate(
+                                        this.buildDefaultTemplate(),
+                                    ),
+                                );
                             }
                         }
                     },
