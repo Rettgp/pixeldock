@@ -62,35 +62,32 @@ export default class MenuBuilder {
                     type: 'radio' as const,
                     checked: possibleDisplay.id === this.preferredDisplayId,
                     click: async () => {
-                        const win = this.mainWindow;
-                        if (win) {
-                            try {
-                                const existing =
-                                    await this.settingsService.fetchSettings();
-                                await this.settingsService.saveSettings({
-                                    // eslint-disable-next-line no-underscore-dangle
-                                    id: existing._id ?? '0',
-                                    display: possibleDisplay.id,
-                                    steamLibraryCache:
-                                        existing.steamLibraryCache ?? '',
-                                    steamGamesLibrary:
-                                        existing.steamGamesLibrary ?? '',
-                                });
-                                this.preferredDisplayId = possibleDisplay.id;
-                                this.positionWindow(possibleDisplay);
-                            } catch (error) {
-                                log.error(
-                                    'Failed to persist preferred display selection',
-                                    error,
-                                );
-                                // Restore the checked radio item so the menu UI
-                                // matches the unchanged preferred display.
-                                Menu.setApplicationMenu(
-                                    Menu.buildFromTemplate(
-                                        this.buildDefaultTemplate(),
-                                    ),
-                                );
-                            }
+                        try {
+                            const existing =
+                                await this.settingsService.fetchSettings();
+                            await this.settingsService.saveSettings({
+                                // eslint-disable-next-line no-underscore-dangle
+                                id: existing._id ?? '0',
+                                display: possibleDisplay.id,
+                                steamLibraryCache:
+                                    existing.steamLibraryCache ?? '',
+                                steamGamesLibrary:
+                                    existing.steamGamesLibrary ?? '',
+                            });
+                            this.preferredDisplayId = possibleDisplay.id;
+                            this.positionWindow(possibleDisplay);
+                        } catch (error) {
+                            log.error(
+                                'Failed to persist preferred display selection',
+                                error,
+                            );
+                            // Restore the checked radio item so the menu UI
+                            // matches the unchanged preferred display.
+                            Menu.setApplicationMenu(
+                                Menu.buildFromTemplate(
+                                    this.buildDefaultTemplate(),
+                                ),
+                            );
                         }
                     },
                 };
