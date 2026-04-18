@@ -198,7 +198,7 @@ When('I update the preferred monitor to {string}', async (monitor: string) => {
     testResult = updated.display ? `Monitor ${updated.display}` : null;
 });
 
-Then('the preferred monitor should be the primary monitor', () => {
+Then('the preferred monitor should be null', () => {
     assert.strictEqual(testResult, null);
 });
 
