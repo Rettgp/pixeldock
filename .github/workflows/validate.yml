@@ -2,11 +2,8 @@ name: Validate
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  schedule:
-    - cron: '44 16 * * 4'
+    branches-ignore:
+      - 'v*'
 
 jobs:
   test:
