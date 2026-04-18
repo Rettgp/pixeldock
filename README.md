@@ -6,7 +6,7 @@
 
   <!-- Badges -->
   <p>
-    <img src="https://img.shields.io/badge/version-0.2.1-blue" alt="Version"/>
+    <img src="https://img.shields.io/badge/version-0.7.0-blue" alt="Version"/>
     <img src="https://img.shields.io/badge/react-19.0.0-61DAFB?logo=react" alt="React"/>
     <img src="https://img.shields.io/badge/electron-35.0.2-47848F?logo=electron" alt="Electron"/>
   </p>
