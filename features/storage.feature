@@ -62,10 +62,10 @@ Feature: Game storage
     When I clear all games
     Then no bulk delete should occur
 
-  Scenario: Preferred Monitor defaults to the primary monitor
+  Scenario: Preferred Monitor falls back to the primary monitor when none is stored
     Given the database has no preferred monitor
     When I fetch the preferred monitor
-    Then the preferred monitor should be the primary monitor
+    Then the preferred monitor should fall back to the primary monitor
 
   Scenario: Preferred Monitor is stored and retrieved
     Given the database has a preferred monitor "Monitor 1"
