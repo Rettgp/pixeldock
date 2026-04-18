@@ -97,18 +97,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Generate release notes
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --latest --strip all
-        env:
-          OUTPUT: CHANGES.md
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPO: ${{ github.repository }}
-
-      - name: Update release notes
+      - name: Install git-cliff
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          gh release download --repo orhun/git-cliff --pattern "git-cliff-*-x86_64-unknown-linux-musl.tar.gz" --dir /tmp/git-cliff
+          tar xzf /tmp/git-cliff/git-cliff-*.tar.gz -C /tmp/git-cliff
+          sudo mv /tmp/git-cliff/git-cliff-*/git-cliff /usr/local/bin/
+
+      - name: Generate and update release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git-cliff --config cliff.toml --latest --strip all --output CHANGES.md
           gh release edit "${{ github.ref_name }}" --notes-file CHANGES.md
