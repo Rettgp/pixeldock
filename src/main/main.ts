@@ -178,7 +178,25 @@ class Main {
             return path.join(RESOURCES_PATH, ...paths);
         };
 
-        const display = screen.getPrimaryDisplay();
+        const primaryDisplay = screen.getPrimaryDisplay();
+        let display = primaryDisplay;
+        let preferredDisplayId = primaryDisplay.id;
+
+        try {
+            const settings = await settingsService.fetchSettings();
+            const allDisplays = screen.getAllDisplays();
+            display = settings.display
+                ? (allDisplays.find((d) => d.id === settings.display) ??
+                  primaryDisplay)
+                : primaryDisplay;
+            preferredDisplayId = display.id;
+        } catch (error) {
+            log.error(
+                'Failed to fetch settings for display selection; falling back to primary display.',
+                error,
+            );
+        }
+
         const factor = display.scaleFactor;
         const monitorHeight = display.size.height;
         const preferredWidth = 500;
@@ -219,7 +237,11 @@ class Main {
 
         this.mainWindow.setSkipTaskbar(true);
 
-        const menuBuilder = new MenuBuilder(this.mainWindow);
+        const menuBuilder = new MenuBuilder(
+            this.mainWindow,
+            settingsService,
+            preferredDisplayId,
+        );
         menuBuilder.buildMenu();
 
         // Open urls in the user's browser

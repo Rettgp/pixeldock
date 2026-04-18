@@ -12,45 +12,81 @@ permissions:
   pull-requests: write
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
+  lint:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Run tests using reusable action
+      - name: Run lint
+        uses: ./.github/actions/lint
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run tests
         uses: ./.github/actions/test
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-  publish-release:
-    needs: test
-    runs-on: ${{ matrix.os }}
+  build:
+    needs: [lint, test]
+    runs-on: windows-latest
 
-    strategy:
-      matrix:
-        os: [windows-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run build
+        uses: ./.github/actions/build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: release/app/dist/
+
+  publish-release:
+    needs: build
+    runs-on: windows-latest
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --latest --strip all
+        env:
+          OUTPUT: CHANGES.md
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Install Node and NPM
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install and build
+      - name: Install dependencies and postinstall
         run: |
           npm install
           npm run postinstall
-          npm run build
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: release/app/dist/
 
       - name: Publish releases
         shell: pwsh
@@ -60,3 +96,10 @@ jobs:
           DEBUG: electron-builder
         run: |
           npm exec -- electron-builder --publish=always --win --draft=false --prerelease=false
+
+      - name: Update release notes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "${{ github.ref_name }}" --notes-file CHANGES.md
