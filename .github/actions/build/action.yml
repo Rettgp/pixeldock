@@ -4,9 +4,6 @@ description: Reusable action to build the app
 runs:
   using: 'composite'
   steps:
-    - name: Check out Git repository
-      uses: actions/checkout@v4
-
     - name: Install Node and NPM
       uses: actions/setup-node@v4
       with:
