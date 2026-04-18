@@ -178,14 +178,25 @@ class Main {
             return path.join(RESOURCES_PATH, ...paths);
         };
 
-        const settings = await settingsService.fetchSettings();
-        const allDisplays = screen.getAllDisplays();
         const primaryDisplay = screen.getPrimaryDisplay();
-        const display = settings.display
-            ? (allDisplays.find((d) => d.id === settings.display) ??
-              primaryDisplay)
-            : primaryDisplay;
-        const preferredDisplayId = display.id;
+        let display = primaryDisplay;
+        let preferredDisplayId = primaryDisplay.id;
+
+        try {
+            const settings = await settingsService.fetchSettings();
+            const allDisplays = screen.getAllDisplays();
+            display = settings.display
+                ? (allDisplays.find((d) => d.id === settings.display) ??
+                  primaryDisplay)
+                : primaryDisplay;
+            preferredDisplayId = display.id;
+        } catch (error) {
+            log.error(
+                'Failed to fetch settings for display selection; falling back to primary display.',
+                error,
+            );
+        }
+
         const factor = display.scaleFactor;
         const monitorHeight = display.size.height;
         const preferredWidth = 500;
