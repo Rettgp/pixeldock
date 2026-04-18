@@ -12,23 +12,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v4
-
-      - name: Install Node.js and NPM
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm install
-
       - name: Run tests
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm test
+        uses: ./.github/actions/test
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run lint
+        uses: ./.github/actions/lint
+
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Run build
+        uses: ./.github/actions/build
 
   codeql:
     runs-on: ubuntu-latest

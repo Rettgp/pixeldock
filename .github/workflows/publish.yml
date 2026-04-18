@@ -12,21 +12,38 @@ permissions:
   pull-requests: write
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
+  lint:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Run tests using reusable action
+      - name: Run lint
+        uses: ./.github/actions/lint
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run tests
         uses: ./.github/actions/test
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+  build:
+    needs: [lint, test]
+    runs-on: windows-latest
+
+    steps:
+      - name: Run build
+        uses: ./.github/actions/build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: release/app/dist/
+
   publish-release:
-    needs: test
+    needs: build
     runs-on: windows-latest
 
     steps:
@@ -51,11 +68,16 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install and build
+      - name: Install dependencies and postinstall
         run: |
           npm install
           npm run postinstall
-          npm run build
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: release/app/dist/
 
       - name: Publish releases
         shell: pwsh
