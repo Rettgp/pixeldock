@@ -4,6 +4,8 @@ on:
   push:
     branches-ignore:
       - 'v*'
+  pull_request:
+    branches: [main]
 
 jobs:
   test:
