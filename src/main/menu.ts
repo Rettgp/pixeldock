@@ -1,10 +1,21 @@
 import { screen, Menu, shell, BrowserWindow, Display } from 'electron';
+import SettingsService from './SettingsService';
 
 export default class MenuBuilder {
     mainWindow: BrowserWindow;
 
-    constructor(mainWindow: BrowserWindow) {
+    private settingsService: SettingsService;
+
+    private preferredDisplayId: number;
+
+    constructor(
+        mainWindow: BrowserWindow,
+        settingsService: SettingsService,
+        preferredDisplayId: number,
+    ) {
         this.mainWindow = mainWindow;
+        this.settingsService = settingsService;
+        this.preferredDisplayId = preferredDisplayId;
     }
 
     buildMenu(): Menu {
@@ -36,17 +47,41 @@ export default class MenuBuilder {
     }
 
     buildDefaultTemplate() {
-        const displays = screen.getAllDisplays();
+        const sortedDisplays = screen
+            .getAllDisplays()
+            .sort((a, b) => a.bounds.x - b.bounds.x);
+        const primaryDisplay = screen.getPrimaryDisplay();
         const templateDefault = [
-            ...displays.map((possibleDisplay, index) => ({
-                label: `Monitor ${index + 1}`,
-                click: () => {
-                    const win = this.mainWindow;
-                    if (win) {
-                        this.positionWindow(possibleDisplay);
-                    }
-                },
-            })),
+            ...sortedDisplays.map((possibleDisplay, index) => {
+                const isPrimary = possibleDisplay.id === primaryDisplay.id;
+                const name = possibleDisplay.label || `Monitor ${index + 1}`;
+                const label = isPrimary ? `${name} (Primary)` : name;
+                return {
+                    label,
+                    type: 'radio' as const,
+                    checked: possibleDisplay.id === this.preferredDisplayId,
+                    click: () => {
+                        const win = this.mainWindow;
+                        if (win) {
+                            this.positionWindow(possibleDisplay);
+                            this.preferredDisplayId = possibleDisplay.id;
+                            this.settingsService
+                                .fetchSettings()
+                                .then((existing) =>
+                                    this.settingsService.saveSettings({
+                                        id: existing._id ?? '0',
+                                        display: possibleDisplay.id,
+                                        steamLibraryCache:
+                                            existing.steamLibraryCache ?? '',
+                                        steamGamesLibrary:
+                                            existing.steamGamesLibrary ?? '',
+                                    }),
+                                )
+                                .catch(() => {});
+                        }
+                    },
+                };
+            }),
             {
                 label: 'Help',
                 submenu: [

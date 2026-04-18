@@ -10,7 +10,8 @@ import assert from 'assert';
 import PouchDB from 'pouchdb';
 import memoryAdapter from 'pouchdb-adapter-memory';
 import StorageService from '../../src/main/CustomGameService';
-import { CustomGame } from '../../src/main/StorageType';
+import SettingsService from '../../src/main/SettingsService';
+import { CustomGame, Settings } from '../../src/main/StorageType';
 
 PouchDB.plugin(memoryAdapter);
 setDefaultTimeout(5000);
@@ -18,19 +19,22 @@ setDefaultTimeout(5000);
 let testResult: any;
 let thrownError: Error | null = null;
 let memoryDB: PouchDB.Database<CustomGame>;
+let settingsDB: PouchDB.Database<Settings>;
 let storageService: StorageService;
+let settingsService: SettingsService;
 
 Before(async () => {
     if (memoryDB) {
         await memoryDB.destroy();
     }
+    if (settingsDB) {
+        await settingsDB.destroy();
+    }
     memoryDB = new PouchDB<CustomGame>('test', { adapter: 'memory' });
+    settingsDB = new PouchDB<Settings>('settings-test', { adapter: 'memory' });
     storageService = new StorageService(memoryDB);
+    settingsService = new SettingsService(settingsDB);
 });
-
-// Given('the database throws on put', () => {
-//   mockPut.mockRejectedValue(new Error('Failed to add game'));
-// });
 
 When('I add a game with:', async function (dataTable) {
     const game = dataTable.rowsHash();
@@ -99,19 +103,10 @@ Then('I should receive an empty list', () => {
 });
 
 // Remove Game
-
 Given('the game {string} exists in the database', async (id: string) => {
     const doc = { _id: id, name: 'Game One', exe: 'path1', heroPath: 'hero1' };
     await memoryDB.put(doc);
 });
-
-// Given('removal of the game will fail', () => {
-//   mockRemove.mockRejectedValue(new Error('failed_remove'));
-// });
-
-// Given('the database throws on get for id {string}', (id: string) => {
-//   mockGet.mockRejectedValue(new Error('not_found'));
-// });
 
 When('I remove the game {string}', async (id: string) => {
     testResult = await storageService.removeGame(id);
@@ -131,7 +126,6 @@ Then(
 );
 
 // Clear Games
-
 Given('the database contains:', async (dataTable) => {
     const docs = dataTable.hashes().map((row: any) => ({
         _id: row.id,
@@ -165,4 +159,48 @@ Then('the deleted documents should be:', async (dataTable) => {
 Then('no bulk delete should occur', async () => {
     const result = await memoryDB.allDocs();
     assert.strictEqual(result.rows.length, 0);
+});
+
+// Preferred Monitor
+Given('the database has no preferred monitor', () => {});
+
+Given(
+    'the database has a preferred monitor {string}',
+    async (monitor: string) => {
+        // Use the monitor number as a stand-in for a stable OS display id
+        const id = parseInt(monitor.replace('Monitor ', ''), 10);
+        await settingsService.saveSettings({
+            id: '0',
+            display: id,
+            steamLibraryCache: '',
+            steamGamesLibrary: '',
+        });
+    },
+);
+
+When('I fetch the preferred monitor', async () => {
+    const settings = await settingsService.fetchSettings();
+    // display === 0 means no preference stored (0 is never a valid OS display id)
+    testResult = settings.display ? `Monitor ${settings.display}` : null;
+});
+
+When('I update the preferred monitor to {string}', async (monitor: string) => {
+    const id = parseInt(monitor.replace('Monitor ', ''), 10);
+    const existing = await settingsService.fetchSettings();
+    await settingsService.saveSettings({
+        id: existing._id ?? '0',
+        display: id,
+        steamLibraryCache: existing.steamLibraryCache ?? '',
+        steamGamesLibrary: existing.steamGamesLibrary ?? '',
+    });
+    const updated = await settingsService.fetchSettings();
+    testResult = updated.display ? `Monitor ${updated.display}` : null;
+});
+
+Then('the preferred monitor should be the primary monitor', () => {
+    assert.strictEqual(testResult, null);
+});
+
+Then('the preferred monitor should be {string}', (monitor: string) => {
+    assert.strictEqual(testResult, monitor);
 });

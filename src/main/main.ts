@@ -178,7 +178,14 @@ class Main {
             return path.join(RESOURCES_PATH, ...paths);
         };
 
-        const display = screen.getPrimaryDisplay();
+        const settings = await settingsService.fetchSettings();
+        const allDisplays = screen.getAllDisplays();
+        const primaryDisplay = screen.getPrimaryDisplay();
+        const display = settings.display
+            ? (allDisplays.find((d) => d.id === settings.display) ??
+              primaryDisplay)
+            : primaryDisplay;
+        const preferredDisplayId = display.id;
         const factor = display.scaleFactor;
         const monitorHeight = display.size.height;
         const preferredWidth = 500;
@@ -219,7 +226,11 @@ class Main {
 
         this.mainWindow.setSkipTaskbar(true);
 
-        const menuBuilder = new MenuBuilder(this.mainWindow);
+        const menuBuilder = new MenuBuilder(
+            this.mainWindow,
+            settingsService,
+            preferredDisplayId,
+        );
         menuBuilder.buildMenu();
 
         // Open urls in the user's browser
