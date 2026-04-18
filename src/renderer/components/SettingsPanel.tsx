@@ -24,11 +24,10 @@ const openFileBrowser = (): Promise<string> => {
 
 export default function SettingsPanel() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState<Settings>({
+    const [formData, setFormData] = useState<Omit<Settings, 'display'>>({
         _id: uuidv4(),
         steamLibraryCache: '',
         steamGamesLibrary: '',
-        display: 1,
     });
 
     const fetchSettings = async () => {
@@ -39,10 +38,8 @@ export default function SettingsPanel() {
             .then((fetchedSettings) => {
                 setFormData((prev) => ({
                     ...prev,
-                    ...fetchedSettings,
                     steamLibraryCache: fetchedSettings.steamLibraryCache ?? '',
                     steamGamesLibrary: fetchedSettings.steamGamesLibrary ?? '',
-                    display: fetchedSettings.display ?? 1,
                     // eslint-disable-next-line no-underscore-dangle
                     _id: fetchedSettings._id ?? prev._id,
                 }));
