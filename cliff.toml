@@ -16,6 +16,8 @@ body = """
   {%- if commit.remote.pr_title %}
   * {{ commit.remote.pr_title | split(pat="\n") | first | trim }} \
     [#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }})
+  {%- else %}
+  * {{ commit.message | split(pat="\n") | first | trim }}
   {%- endif %}
 {%- endfor %}
 
