@@ -61,29 +61,26 @@ export default class MenuBuilder {
                     label,
                     type: 'radio' as const,
                     checked: possibleDisplay.id === this.preferredDisplayId,
-                    click: () => {
+                    click: async () => {
                         const win = this.mainWindow;
                         if (win) {
                             this.positionWindow(possibleDisplay);
-                            this.preferredDisplayId = possibleDisplay.id;
-                            this.settingsService
-                                .fetchSettings()
-                                .then((existing) =>
-                                    this.settingsService.saveSettings({
-                                        id: existing._id ?? '0',
-                                        display: possibleDisplay.id,
-                                        steamLibraryCache:
-                                            existing.steamLibraryCache ?? '',
-                                        steamGamesLibrary:
-                                            existing.steamGamesLibrary ?? '',
-                                    }),
-                                )
-                                .catch((error) => {
-                                    log.error(
-                                        `Failed to persist preferred display selection: ${possibleDisplay.id}`,
-                                        error,
-                                    );
+                            try {
+                                const existing =
+                                    await this.settingsService.fetchSettings();
+                                await this.settingsService.saveSettings({
+                                    id: existing._id ?? '0',
+                                    display: possibleDisplay.id,
+                                    steamLibraryCache:
+                                        existing.steamLibraryCache ?? '',
+                                    steamGamesLibrary:
+                                        existing.steamGamesLibrary ?? '',
                                 });
+                                this.preferredDisplayId = possibleDisplay.id;
+                            } catch {
+                                // Keep the in-memory preferred display unchanged
+                                // if the settings cannot be persisted.
+                            }
                         }
                     },
                 };
