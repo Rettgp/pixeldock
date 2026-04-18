@@ -51,7 +51,7 @@
         "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true NODE_OPTIONS=\"-r ts-node/register --no-warnings\" webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
         "test": "cross-env TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js",
         "update-badges": "node .erb/scripts/update-badges.js",
-        "version": "node .erb/scripts/update-badges.js && git add README.md"
+        "version": "node .erb/scripts/update-badges.js && git add README.md release/app/package.json"
     },
     "browserslist": [
         "extends browserslist-config-erb"

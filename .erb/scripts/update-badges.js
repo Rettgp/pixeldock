@@ -1,17 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 
-const rootPkg = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8'),
-);
-const appPkg = JSON.parse(
-    fs.readFileSync(
-        path.join(__dirname, '../../release/app/package.json'),
-        'utf8',
-    ),
-);
+const rootPkgPath = path.join(__dirname, '../../package.json');
+const appPkgPath = path.join(__dirname, '../../release/app/package.json');
 
-const version = appPkg.version;
+const rootPkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf8'));
+const appPkg = JSON.parse(fs.readFileSync(appPkgPath, 'utf8'));
+
+const version = rootPkg.version;
+
+// Sync version from root package.json into release/app/package.json
+appPkg.version = version;
+fs.writeFileSync(appPkgPath, JSON.stringify(appPkg, null, 2) + '\n');
 const react = rootPkg.dependencies.react.replace(/[\^~>=<]/g, '');
 const electron = rootPkg.devDependencies.electron.replace(/[\^~>=<]/g, '');
 
