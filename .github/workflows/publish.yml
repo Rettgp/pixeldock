@@ -21,7 +21,9 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run tests using reusable action
         uses: ./.github/actions/test
@@ -30,18 +32,26 @@ jobs:
 
   publish-release:
     needs: test
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [windows-latest]
+    runs-on: windows-latest
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --latest --strip all
+        env:
+          OUTPUT: CHANGES.md
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Install Node and NPM
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
@@ -60,3 +70,10 @@ jobs:
           DEBUG: electron-builder
         run: |
           npm exec -- electron-builder --publish=always --win --draft=false --prerelease=false
+
+      - name: Update release notes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "${{ github.ref_name }}" --notes-file CHANGES.md

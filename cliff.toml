@@ -1,10 +1,9 @@
 # git-cliff ~ configuration file
 # https://git-cliff.org/docs/configuration
 
-# [remote.github]
-# owner = "orhun"
-# repo = "git-cliff"
-# token = ""
+[remote.github]
+owner = "Rettgp"
+repo = "pixeldock"
 
 [changelog]
 # template for the changelog body
@@ -14,38 +13,17 @@ body = """
 
 {%- if version %} in {{ version }}{%- endif -%}
 {% for commit in commits %}
-  {% if commit.remote.pr_title -%}
-    {%- set commit_message = commit.remote.pr_title -%}
-  {%- else -%}
-    {%- set commit_message = commit.message -%}
-  {%- endif -%}
-  * {{ commit_message | split(pat="\n") | first | trim }}\
-    {% if commit.remote.username %} by @{{ commit.remote.username }}{%- endif -%}
-    {% if commit.remote.pr_number %} in \
-      [#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }}) \
-    {%- endif %}
-{%- endfor -%}
-
-{%- if github -%}
-{% if github.contributors | filter(attribute="is_first_time", value=true) | length != 0 %}
-  {% raw %}\n{% endraw -%}
-  ## New Contributors
-{%- endif %}\
-{% for contributor in github.contributors | filter(attribute="is_first_time", value=true) %}
-  * @{{ contributor.username }} made their first contribution
-    {%- if contributor.pr_number %} in \
-      [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }}) \
-    {%- endif %}
-{%- endfor -%}
-{%- endif -%}
+  {%- if commit.remote.pr_title %}
+  * {{ commit.remote.pr_title | split(pat="\n") | first | trim }} \
+    [#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }})
+  {%- endif %}
+{%- endfor %}
 
 {% if version %}
-    {% if previous.version %}
-      **Full Changelog**: {{ self::remote_url() }}/compare/{{ previous.version }}...{{ version }}
-    {% endif %}
-{% else -%}
-  {% raw %}\n{% endraw %}
-{% endif %}
+  {%- if previous.version %}
+**Full Changelog**: {{ self::remote_url() }}/compare/{{ previous.version }}...{{ version }}
+  {%- endif %}
+{%- endif %}
 
 {%- macro remote_url() -%}
   https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
