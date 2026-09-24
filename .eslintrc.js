@@ -15,6 +15,8 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': 'error',
         'class-methods-use-this': 'off',
         'react/prop-types': 'off',
+        // Optional props on typed function components don't use defaultProps
+        'react/require-default-props': 'off',
     },
     parserOptions: {
         ecmaVersion: 2022,

@@ -1,6 +1,10 @@
 *       text    eol=lf
 *.exe   binary
 *.png   binary
+*.gif   binary
+*.webp  binary
+*.mp4   binary
+*.webm  binary
 *.jpg   binary
 *.jpeg  binary
 *.ico   binary

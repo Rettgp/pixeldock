@@ -11,8 +11,13 @@ export default class SettingsService {
     }
 
     saveSettings = async (
-        settings: Omit<Settings, '_id' | '_rev'> & { id: string },
+        input: Partial<Omit<Settings, '_id' | '_rev'>> & { id: string },
     ): Promise<Response> => {
+        // Only merge fields that were provided so a partial save (e.g. just
+        // the Steam paths) never clears the preferred display.
+        const settings = Object.fromEntries(
+            Object.entries(input).filter(([, value]) => value !== undefined),
+        ) as typeof input;
         try {
             const existingDoc = await this.settingsDb.get<Settings>(
                 settings.id,
@@ -29,8 +34,11 @@ export default class SettingsService {
         } catch (err: any) {
             if (err.status === 404) {
                 const newDoc: Settings = {
-                    _id: settings.id,
+                    display: 0,
+                    steamLibraryCache: '',
+                    steamGamesLibrary: '',
                     ...settings,
+                    _id: settings.id,
                 };
                 return this.settingsDb.put(newDoc);
             }
@@ -43,6 +51,13 @@ export default class SettingsService {
         const settings = result.rows
             .map((row: any) => row.doc!)
             .filter(Boolean);
-        return settings?.[0] ?? { id: '0', display: 0 };
+        return (
+            settings?.[0] ?? {
+                _id: '0',
+                display: 0,
+                steamLibraryCache: '',
+                steamGamesLibrary: '',
+            }
+        );
     };
 }

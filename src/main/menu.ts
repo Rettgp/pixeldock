@@ -1,6 +1,7 @@
-import { screen, Menu, shell, BrowserWindow, Display } from 'electron';
+import { screen, Menu, shell, BrowserWindow } from 'electron';
 import log from 'electron-log/main';
 import SettingsService from './SettingsService';
+import { positionWindow } from './window';
 
 export default class MenuBuilder {
     mainWindow: BrowserWindow;
@@ -28,15 +29,6 @@ export default class MenuBuilder {
         Menu.setApplicationMenu(menu);
 
         return menu;
-    }
-
-    positionWindow(display: Display): void {
-        const factor = display.scaleFactor;
-        const preferredWidth = 500;
-        this.mainWindow!.setPosition(
-            display.size.width - preferredWidth / factor + display.bounds.x,
-            0,
-        );
     }
 
     setupMenu(): void {
@@ -69,13 +61,9 @@ export default class MenuBuilder {
                                 // eslint-disable-next-line no-underscore-dangle
                                 id: existing._id ?? '0',
                                 display: possibleDisplay.id,
-                                steamLibraryCache:
-                                    existing.steamLibraryCache ?? '',
-                                steamGamesLibrary:
-                                    existing.steamGamesLibrary ?? '',
                             });
                             this.preferredDisplayId = possibleDisplay.id;
-                            this.positionWindow(possibleDisplay);
+                            positionWindow(this.mainWindow, possibleDisplay);
                         } catch (error) {
                             log.error(
                                 'Failed to persist preferred display selection',
