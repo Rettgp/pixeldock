@@ -6,7 +6,7 @@
 
   <!-- Badges -->
   <p>
-    <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version"/>
+    <img src="https://img.shields.io/badge/version-1.0.1-blue" alt="Version"/>
     <img src="https://img.shields.io/badge/react-19.0.0-61DAFB?logo=react" alt="React"/>
     <img src="https://img.shields.io/badge/electron-35.0.2-47848F?logo=electron" alt="Electron"/>
   </p>
@@ -60,9 +60,21 @@
 
 ## 📦 Installation
 
+Download `PixelDock-Setup-<version>.exe` from the
+[latest release](https://github.com/rettgp/pixeldock/releases/latest) and run it.
+
+> [!NOTE]
+> **Seeing "Windows protected your PC"?** Microsoft Defender SmartScreen shows this
+> for apps it hasn't seen many downloads of yet. Click **More info → Run anyway**.
+> PixelDock is open source; you can review the code or build it yourself below.
+
+### Build from source
+
 ```bash
 git clone https://github.com/rettgp/pixeldock.git
 cd pixeldock
 npm install
 npm run start
 ```
+
+Maintainers: see [docs/RELEASING.md](docs/RELEASING.md) for publishing, code signing and winget.
