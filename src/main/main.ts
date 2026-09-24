@@ -80,6 +80,18 @@ function serveFromRoot(root: string, relative: string) {
     return net.fetch(pathToFileURL(filePath).toString());
 }
 
+// Image requests are frequent (every icon, logo and hero), so remember the
+// library cache path instead of reading the settings database per request.
+// Cleared whenever settings are saved.
+let libraryCachePath: string | null = null;
+const getLibraryCachePath = async (): Promise<string> => {
+    if (libraryCachePath === null) {
+        const settings = await settingsService.fetchSettings();
+        libraryCachePath = settings.steamLibraryCache ?? '';
+    }
+    return libraryCachePath;
+};
+
 class Main {
     private mainWindow: BrowserWindow | undefined;
 
@@ -126,15 +138,13 @@ class Main {
         // eslint-disable-next-line promise/catch-or-return
         app.whenReady().then(() => {
             protocol.handle('steamimages', async (request) => {
-                const settings = await settingsService.fetchSettings();
                 return serveFromRoot(
-                    settings.steamLibraryCache,
+                    await getLibraryCachePath(),
                     request.url.slice('steamimages://image/'.length),
                 );
             });
             // steamgrid://image/<accountId>/<file> -> userdata/<id>/config/grid
             protocol.handle('steamgrid', async (request) => {
-                const settings = await settingsService.fetchSettings();
                 const [accountId, ...rest] = request.url
                     .slice('steamgrid://image/'.length)
                     .split('/');
@@ -142,7 +152,7 @@ class Main {
                     return new Response('Not found', { status: 404 });
                 }
                 const gridDir = path.join(
-                    steamRootFromCache(settings.steamLibraryCache),
+                    steamRootFromCache(await getLibraryCachePath()),
                     'userdata',
                     accountId,
                     'config',
@@ -174,6 +184,7 @@ class Main {
     }
 
     async onSettingsSaved(displayId: number) {
+        libraryCachePath = null;
         if (this.mainWindow && displayId) {
             positionWindow(this.mainWindow, findDisplay(displayId));
         }

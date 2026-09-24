@@ -39,6 +39,23 @@ const mod = (value: number, n: number) => ((value % n) + n) % n;
 const prefersReducedMotion = () =>
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
+// Heroes and logos are fetched and decoded ahead of hover so the card opens
+// with its art already in memory. Holding the Image objects keeps them
+// decoded; the oldest entries are dropped past the cap to bound memory.
+const PRELOAD_LIMIT = 48;
+const preloaded = new Map<string, HTMLImageElement>();
+function preloadImage(url: string) {
+    if (!url || preloaded.has(url)) return;
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = url;
+    image.decode().catch(() => {});
+    preloaded.set(url, image);
+    if (preloaded.size > PRELOAD_LIMIT) {
+        preloaded.delete(preloaded.keys().next().value as string);
+    }
+}
+
 function useSize(ref: RefObject<HTMLElement | null>) {
     const [size, setSize] = useState({ width: 500, height: 900 });
     useLayoutEffect(() => {
@@ -114,11 +131,16 @@ function MorphCard({
     const [open, setOpen] = useState(false);
     const [failedLogo, setFailedLogo] = useState('');
     const cardRef = useRef<HTMLButtonElement>(null);
+    // The hero fades in only once decoded, so it never pops in mid-morph
+    const heroRef = useRef<HTMLImageElement>(null);
+    const [heroReady, setHeroReady] = useState(false);
 
     useLayoutEffect(() => {
         // Flush the collapsed styles, then open in the same frame so the
         // growth transitions without waiting on extra animation frames
         cardRef.current?.getBoundingClientRect();
+        // A preloaded hero is already complete and won't fire onLoad
+        if (heroRef.current?.complete) setHeroReady(true);
         setOpen(true);
     }, []);
 
@@ -160,15 +182,20 @@ function MorphCard({
                 onClick={onLaunch}
                 onMouseLeave={onLeave}
             >
-                <div
-                    className={`dial-card-art ${game.heroPath ? '' : 'no-art'}`}
-                    style={{
-                        backgroundImage: game.heroPath
-                            ? `url("${game.heroPath}")`
-                            : undefined,
-                        transformOrigin: `${originX}px ${originY}px`,
-                    }}
-                />
+                {game.heroPath ? (
+                    <img
+                        ref={heroRef}
+                        className={`dial-card-art ${heroReady ? 'is-ready' : ''}`}
+                        src={game.heroPath}
+                        alt=""
+                        draggable={false}
+                        style={{ transformOrigin: `${originX}px ${originY}px` }}
+                        onLoad={() => setHeroReady(true)}
+                        onError={() => setHeroReady(true)}
+                    />
+                ) : (
+                    <div className="dial-card-art no-art is-ready" />
+                )}
                 <div className="dial-card-shade" />
                 <span
                     className="dial-card-morph-icon"
@@ -348,12 +375,52 @@ export default function GameDial({ games }: Props) {
         }
         if (!launching) setClosing(true);
     };
+    // Leave events are easy to miss on a transparent window (a fast flick off
+    // the window can skip them), so also close when the pointer is over empty
+    // dial space, leaves the window entirely, or the window loses focus.
+    const onDialMouseMove = (event: MouseEvent) => {
+        if (launching) return;
+        const target = event.target as Element;
+        if (target.closest('.dial-card-wrap')) return;
+        // Moving over an icon or its band opens it, even when no enter event
+        // fired (e.g. the card closed on blur while the pointer sat still)
+        const game = target.closest('[data-v]')?.getAttribute('data-v');
+        if (game !== null && game !== undefined) {
+            if (Number(game) !== hovered || closing) {
+                setClosing(false);
+                setHovered(Number(game));
+            }
+            return;
+        }
+        if (hovered !== null && !closing) setClosing(true);
+    };
+    useEffect(() => {
+        if (hovered === null || launching) return undefined;
+        const close = () => setClosing(true);
+        const root = document.documentElement;
+        root.addEventListener('mouseleave', close);
+        window.addEventListener('blur', close);
+        return () => {
+            root.removeEventListener('mouseleave', close);
+            window.removeEventListener('blur', close);
+        };
+    }, [hovered, launching]);
+
     // The hovered game can scroll out of view before its card finishes
     // closing; drop the stale hover so the dial doesn't think a card is open.
     const staleHover = hovered !== null && !active;
     useEffect(() => {
         if (staleHover) closeCard();
     }, [staleHover, closeCard]);
+
+    // Warm the art for every game on the dial so hovering never waits on it.
+    // Keyed on which games are showing, not on every animation frame.
+    const visibleArt = items
+        .flatMap((item) => [item.game.heroPath, item.game.logoPath])
+        .join('|');
+    useEffect(() => {
+        visibleArt.split('|').forEach(preloadImage);
+    }, [visibleArt]);
     let card = null;
     if (active) {
         const left = clamp(
@@ -399,6 +466,7 @@ export default function GameDial({ games }: Props) {
             ref={containerRef}
             className={`dial ${active ? 'has-card' : ''}`}
             onWheel={onWheel}
+            onMouseMove={onDialMouseMove}
             onKeyDown={onKeyDown}
             role="listbox"
             aria-label="Game library"
@@ -456,6 +524,7 @@ export default function GameDial({ games }: Props) {
                             height: SPACING,
                         }}
                         data-hit={item.v}
+                        data-v={item.v}
                         onMouseEnter={() => {
                             setClosing(false);
                             setHovered(item.v);
@@ -471,6 +540,7 @@ export default function GameDial({ games }: Props) {
                     type="button"
                     key={item.v}
                     id={`dial-item-${item.v}`}
+                    data-v={item.v}
                     role="option"
                     aria-selected={item.v === focusedVirtual}
                     aria-label={item.game.name}

@@ -161,8 +161,10 @@
 .dial-card-art {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     opacity: 0;
     transform: scale(1.18);
     /* Long, soft settle: the hero keeps drifting in after the card opens */
@@ -215,7 +217,7 @@
         translate 100ms ease;
 }
 
-.dial-card-wrap.is-open .dial-card-art {
+.dial-card-wrap.is-open .dial-card-art.is-ready {
     opacity: 1;
     transform: scale(1.04);
 }
