@@ -54,6 +54,12 @@ jobs:
   publish-release:
     needs: build
     runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Free code signing through SignPath Foundation turns on once its
+      # repository variables are set (see docs/RELEASING.md). Until then
+      # releases are published unsigned, exactly as before.
+      SIGNPATH_ENABLED: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
 
     steps:
       - name: Checkout git repo
@@ -78,14 +84,91 @@ jobs:
           name: build-output
           path: release/app/dist/
 
-      - name: Publish releases
+      # Package without publishing so the installer can be signed first
+      - name: Package installer
         shell: pwsh
         env:
-          # This is used for uploading release assets to github
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEBUG: electron-builder
         run: |
-          npm exec -- electron-builder --publish=always --win
+          npm exec -- electron-builder --publish=never --win
+
+      - name: Locate installer
+        id: installer
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "path=release/build/PixelDock-Setup-$version.exe" >> "$GITHUB_OUTPUT"
+
+      - name: Upload unsigned installer for signing
+        if: env.SIGNPATH_ENABLED == 'true'
+        id: unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-installer
+          path: ${{ steps.installer.outputs.path }}
+
+      - name: Sign installer with SignPath
+        if: env.SIGNPATH_ENABLED == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: release/signed
+
+      - name: Swap in signed installer
+        if: env.SIGNPATH_ENABLED == 'true'
+        shell: bash
+        env:
+          INSTALLER: ${{ steps.installer.outputs.path }}
+        run: |
+          cp "release/signed/$(basename "$INSTALLER")" "$INSTALLER"
+          # The blockmap describes the unsigned bytes; drop it rather than ship a stale one
+          rm -f "$INSTALLER.blockmap"
+          node .erb/scripts/refresh-latest-yml.js "$INSTALLER" release/build/latest.yml
+
+      - name: Generate winget manifests
+        shell: bash
+        run: node .erb/scripts/winget-manifest.js "${{ steps.installer.outputs.path }}" release/winget
+
+      - name: Upload winget manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: winget-manifests
+          path: release/winget/
+
+      - name: Publish GitHub release
+        shell: bash
+        env:
+          INSTALLER: ${{ steps.installer.outputs.path }}
+        run: |
+          tag="$GITHUB_REF_NAME"
+          files=("$INSTALLER" release/build/latest.yml)
+          if [ -f "$INSTALLER.blockmap" ]; then files+=("$INSTALLER.blockmap"); fi
+          gh release view "$tag" > /dev/null 2>&1 || gh release create "$tag" --title "$tag" --notes ""
+          gh release upload "$tag" "${files[@]}" --clobber
+
+  # Keeps winget up to date after the first manual submission. Turn it on
+  # with the WINGET_AUTO_UPDATE variable and a WINGET_TOKEN secret (a GitHub
+  # token with public_repo scope); see docs/RELEASING.md.
+  winget:
+    needs: publish-release
+    runs-on: windows-latest
+    if: vars.WINGET_AUTO_UPDATE == 'true'
+
+    steps:
+      - name: Submit winget update
+        shell: pwsh
+        env:
+          WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          $url = "https://github.com/rettgp/pixeldock/releases/download/v$version/PixelDock-Setup-$version.exe"
+          Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          ./wingetcreate.exe update Rettgp.PixelDock --version $version --urls $url --submit --token $env:WINGET_TOKEN
 
   generate-changelog:
     needs: publish-release
