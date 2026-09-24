@@ -2,6 +2,7 @@
 import * as fs from 'fs';
 import log from 'electron-log/main';
 import { SteamGame } from '../types';
+import { parseTextVdf } from './TextVdfParser';
 
 export class InvalidAppId extends Error {
     constructor(appid: string) {
@@ -22,42 +23,18 @@ export class InvalidState extends Error {
 }
 
 function createGameFromAcf(content: string): SteamGame {
-    const lines = content.split(/\r?\n/).map((line) => line.trim());
-    const stack: any[] = [{}];
-    let currentKey = '';
+    const vdf: any = parseTextVdf(content);
+    const appState = vdf.AppState ?? {};
 
-    lines.forEach((line) => {
-        if (line === '{') {
-            const newObj = {};
-            stack[stack.length - 1][currentKey] = newObj;
-            stack.push(newObj);
-        } else if (line === '}') {
-            stack.pop();
-        } else {
-            const match = line.match(/"(.*?)"\s+"(.*?)"/);
-            if (match) {
-                const [, key, value] = match;
-                stack[stack.length - 1][key] = value;
-            } else {
-                const keyMatch = line.match(/"(.*?)"/);
-                if (keyMatch) {
-                    [, currentKey] = keyMatch;
-                }
-            }
-        }
-    });
-
-    if (stack[0].AppState.appid === undefined)
-        throw new InvalidAppId(stack[0].appid);
-    if (stack[0].AppState.name === undefined)
-        throw new InvalidName(stack[0].name);
-    if (stack[0].AppState.StateFlags === undefined)
-        throw new InvalidState(stack[0].StateFlags);
+    if (appState.appid === undefined) throw new InvalidAppId(appState.appid);
+    if (appState.name === undefined) throw new InvalidName(appState.name);
+    if (appState.StateFlags === undefined)
+        throw new InvalidState(appState.StateFlags);
 
     return {
-        appid: stack[0].AppState.appid,
-        name: stack[0].AppState.name,
-        installed: stack[0].AppState.StateFlags === '4',
+        appid: appState.appid,
+        name: appState.name,
+        installed: appState.StateFlags === '4',
     } as SteamGame;
 }
 

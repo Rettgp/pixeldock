@@ -2,6 +2,7 @@
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 import path from 'path';
+import { pathToFileURL } from 'url';
 import {
     app,
     screen,
@@ -12,7 +13,6 @@ import {
     net,
     Tray,
     Menu,
-    Display,
 } from 'electron';
 import log from 'electron-log/main';
 import MenuBuilder from './menu';
@@ -22,10 +22,13 @@ import ExampleChannel from '../ipc/ExampleChannel';
 import GameLibraryChannel from '../ipc/GameLibraryChannel';
 import OpenFileChannel from '../ipc/OpenFileChannel';
 import NavigateChannel from '../ipc/NavigateChannel';
-import CustomGamesChannel from '../ipc/CustomGamesChannel';
 import SettingsChannel from '../ipc/SettingsChannel';
 import SettingsService from './SettingsService';
 import { createSettingsDb } from './StorageType';
+import LibraryService from './LibraryService';
+import LibraryWatcher from './LibraryWatcher';
+import { steamRootFromCache } from './library-parser/SteamPaths';
+import { findDisplay, positionWindow, PREFERRED_WIDTH } from './window';
 
 log.initialize();
 
@@ -56,15 +59,47 @@ const installExtensions = async () => {
 const settingsService: SettingsService = new SettingsService(
     createSettingsDb(),
 );
+const libraryService = new LibraryService();
+
+const LIBRARY_UPDATED_CHANNEL = 'library-updated';
+
+// Serves `root/<relative>` for a custom protocol, ignoring the cache-busting
+// query string and refusing anything that escapes the root directory.
+function serveFromRoot(root: string, relative: string) {
+    const decoded = decodeURIComponent(relative.split('?')[0]);
+    const resolvedRoot = path.resolve(root);
+    const filePath = path.resolve(resolvedRoot, decoded);
+    if (
+        !root ||
+        !filePath
+            .toLowerCase()
+            .startsWith(`${resolvedRoot.toLowerCase()}${path.sep}`)
+    ) {
+        return new Response('Not found', { status: 404 });
+    }
+    return net.fetch(pathToFileURL(filePath).toString());
+}
 
 class Main {
     private mainWindow: BrowserWindow | undefined;
+
+    private tray: Tray | undefined;
+
+    readonly libraryWatcher = new LibraryWatcher(
+        libraryService,
+        () => settingsService.fetchSettings(),
+        () => this.notifyLibraryUpdated(),
+    );
 
     public init(ipcChannels: IpcChannelInterface[]) {
         app.on('ready', () => {
             this.createWindow();
             this.createTray();
+            this.libraryWatcher
+                .start()
+                .catch((error) => log.error('Failed to start watcher', error));
         });
+        app.on('before-quit', () => this.libraryWatcher.stop());
         app.on('window-all-closed', this.onWindowAllClosed);
         app.on('activate', this.onActivate);
 
@@ -79,7 +114,7 @@ class Main {
                 },
             },
             {
-                scheme: 'local',
+                scheme: 'steamgrid',
                 privileges: {
                     bypassCSP: true,
                     standard: true,
@@ -92,21 +127,28 @@ class Main {
         app.whenReady().then(() => {
             protocol.handle('steamimages', async (request) => {
                 const settings = await settingsService.fetchSettings();
-
-                const filePath = request.url.slice(
-                    'steamimages://image/'.length,
-                );
-                return net.fetch(
-                    path.join(settings.steamLibraryCache, filePath),
+                return serveFromRoot(
+                    settings.steamLibraryCache,
+                    request.url.slice('steamimages://image/'.length),
                 );
             });
-            protocol.handle('local', (request) => {
-                const filePath = request.url.slice('local://'.length);
-                const url = filePath.replace(
-                    /^[a-z]\//,
-                    (match) => `${match[0].toUpperCase()}:/`,
+            // steamgrid://image/<accountId>/<file> -> userdata/<id>/config/grid
+            protocol.handle('steamgrid', async (request) => {
+                const settings = await settingsService.fetchSettings();
+                const [accountId, ...rest] = request.url
+                    .slice('steamgrid://image/'.length)
+                    .split('/');
+                if (!/^\d+$/.test(accountId)) {
+                    return new Response('Not found', { status: 404 });
+                }
+                const gridDir = path.join(
+                    steamRootFromCache(settings.steamLibraryCache),
+                    'userdata',
+                    accountId,
+                    'config',
+                    'grid',
                 );
-                return net.fetch(url);
+                return serveFromRoot(gridDir, rest.join('/'));
             });
         });
 
@@ -125,6 +167,20 @@ class Main {
         }
     }
 
+    notifyLibraryUpdated() {
+        this.mainWindow?.webContents.send(LIBRARY_UPDATED_CHANNEL, {
+            params: [],
+        });
+    }
+
+    async onSettingsSaved(displayId: number) {
+        if (this.mainWindow && displayId) {
+            positionWindow(this.mainWindow, findDisplay(displayId));
+        }
+        await this.libraryWatcher.start();
+        this.notifyLibraryUpdated();
+    }
+
     private navigate(page: string) {
         this.mainWindow?.webContents.send(NavigateChannel.name, {
             params: [page],
@@ -140,29 +196,21 @@ class Main {
     }
 
     private createTray() {
-        const tray = new Tray(this.getAssetPath('icon.png'));
+        this.tray = new Tray(this.getAssetPath('icon.png'));
         const contextMenu = Menu.buildFromTemplate([
             {
                 label: 'Settings',
                 click: () => this.navigate('settings'),
             },
             {
-                label: 'Games',
-                click: () => this.navigate('game-settings'),
+                label: 'Refresh library',
+                click: () => this.libraryWatcher.check(true),
             },
+            { type: 'separator' },
             { label: 'Quit', click: () => app.quit() },
         ]);
-        tray.setToolTip('Game Launch');
-        tray.setContextMenu(contextMenu);
-    }
-
-    private positionWindow(display: Display) {
-        const factor = display.scaleFactor;
-        const preferredWidth = 500;
-        this.mainWindow!.setPosition(
-            display.size.width - preferredWidth / factor + display.bounds.x,
-            0,
-        );
+        this.tray.setToolTip('PixelDock');
+        this.tray.setContextMenu(contextMenu);
     }
 
     private async createWindow() {
@@ -178,17 +226,12 @@ class Main {
             return path.join(RESOURCES_PATH, ...paths);
         };
 
-        const primaryDisplay = screen.getPrimaryDisplay();
-        let display = primaryDisplay;
-        let preferredDisplayId = primaryDisplay.id;
+        let display = screen.getPrimaryDisplay();
+        let preferredDisplayId = display.id;
 
         try {
             const settings = await settingsService.fetchSettings();
-            const allDisplays = screen.getAllDisplays();
-            display = settings.display
-                ? (allDisplays.find((d) => d.id === settings.display) ??
-                  primaryDisplay)
-                : primaryDisplay;
+            display = findDisplay(settings.display);
             preferredDisplayId = display.id;
         } catch (error) {
             log.error(
@@ -199,11 +242,10 @@ class Main {
 
         const factor = display.scaleFactor;
         const monitorHeight = display.size.height;
-        const preferredWidth = 500;
         this.mainWindow = new BrowserWindow({
             show: false,
             x: 0,
-            width: preferredWidth / factor,
+            width: PREFERRED_WIDTH / factor,
             height: monitorHeight / factor,
             transparent: true,
             frame: false,
@@ -218,7 +260,7 @@ class Main {
             },
             alwaysOnTop: false,
         });
-        this.positionWindow(display);
+        positionWindow(this.mainWindow, display);
 
         this.mainWindow.loadFile('../../index.html');
 
@@ -260,11 +302,17 @@ class Main {
     }
 }
 
-new Main().init([
+const main = new Main();
+main.init([
     new ExampleChannel(),
-    new GameLibraryChannel(settingsService),
+    new GameLibraryChannel(settingsService, libraryService, () =>
+        main.libraryWatcher.check(true),
+    ),
     new OpenFileChannel(),
     new NavigateChannel(),
-    new CustomGamesChannel(),
-    new SettingsChannel(settingsService),
+    new SettingsChannel(settingsService, (settings) => {
+        main.onSettingsSaved(settings.display).catch((error) =>
+            log.error('Failed to apply settings', error),
+        );
+    }),
 ]);
