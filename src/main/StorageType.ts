@@ -6,6 +6,8 @@ export type Settings = {
     _id: string;
     _rev?: string;
     display: number;
+    // Horizontal shift from the right screen edge, in pixels
+    offsetX?: number;
     steamLibraryCache: string;
     steamGamesLibrary: string;
 };

@@ -63,7 +63,11 @@ export default class MenuBuilder {
                                 display: possibleDisplay.id,
                             });
                             this.preferredDisplayId = possibleDisplay.id;
-                            positionWindow(this.mainWindow, possibleDisplay);
+                            positionWindow(
+                                this.mainWindow,
+                                possibleDisplay,
+                                existing.offsetX ?? 0,
+                            );
                         } catch (error) {
                             log.error(
                                 'Failed to persist preferred display selection',

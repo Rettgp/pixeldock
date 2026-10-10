@@ -183,10 +183,10 @@ class Main {
         });
     }
 
-    async onSettingsSaved(displayId: number) {
+    async onSettingsSaved(displayId: number, offsetX: number = 0) {
         libraryCachePath = null;
         if (this.mainWindow && displayId) {
-            positionWindow(this.mainWindow, findDisplay(displayId));
+            positionWindow(this.mainWindow, findDisplay(displayId), offsetX);
         }
         await this.libraryWatcher.start();
         this.notifyLibraryUpdated();
@@ -239,11 +239,13 @@ class Main {
 
         let display = screen.getPrimaryDisplay();
         let preferredDisplayId = display.id;
+        let offsetX = 0;
 
         try {
             const settings = await settingsService.fetchSettings();
             display = findDisplay(settings.display);
             preferredDisplayId = display.id;
+            offsetX = settings.offsetX ?? 0;
         } catch (error) {
             log.error(
                 'Failed to fetch settings for display selection; falling back to primary display.',
@@ -271,7 +273,7 @@ class Main {
             },
             alwaysOnTop: false,
         });
-        positionWindow(this.mainWindow, display);
+        positionWindow(this.mainWindow, display, offsetX);
 
         this.mainWindow.loadFile('../../index.html');
 
@@ -322,8 +324,8 @@ main.init([
     new OpenFileChannel(),
     new NavigateChannel(),
     new SettingsChannel(settingsService, (settings) => {
-        main.onSettingsSaved(settings.display).catch((error) =>
-            log.error('Failed to apply settings', error),
+        main.onSettingsSaved(settings.display, settings.offsetX).catch(
+            (error) => log.error('Failed to apply settings', error),
         );
     }),
 ]);

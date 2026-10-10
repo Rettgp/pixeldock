@@ -4,10 +4,12 @@ import {
     Button,
     Card,
     IconButton,
+    Input,
     Modal,
     ModalDialog,
     Option,
     Select,
+    Slider,
     Snackbar,
     Typography,
 } from '@mui/joy';
@@ -26,13 +28,17 @@ import NonSteamHelp from './NonSteamHelp';
 
 interface FormState extends SteamPaths {
     display: number;
+    offsetX: number;
 }
 
 const EMPTY: FormState = {
     steamLibraryCache: '',
     steamGamesLibrary: '',
     display: 0,
+    offsetX: 0,
 };
+
+const MAX_OFFSET = 3000;
 
 function Section({
     title,
@@ -82,6 +88,7 @@ export default function SettingsPanel() {
                     steamLibraryCache: settings.steamLibraryCache ?? '',
                     steamGamesLibrary: settings.steamGamesLibrary ?? '',
                     display: settings.display || primary?.id || 0,
+                    offsetX: settings.offsetX ?? 0,
                 };
                 setDisplays(displayOptions);
                 setSaved(state);
@@ -102,7 +109,8 @@ export default function SettingsPanel() {
     const dirty =
         form.steamLibraryCache !== saved.steamLibraryCache ||
         form.steamGamesLibrary !== saved.steamGamesLibrary ||
-        form.display !== saved.display;
+        form.display !== saved.display ||
+        form.offsetX !== saved.offsetX;
     const valid = !pending && !!validation?.valid;
 
     const save = () => {
@@ -232,6 +240,53 @@ export default function SettingsPanel() {
                         </Option>
                     ))}
                 </Select>
+                <Box>
+                    <Typography level="title-sm">
+                        Distance from right edge
+                    </Typography>
+                    <Typography
+                        level="body-sm"
+                        sx={{ color: tokens.textMuted, mb: 1 }}
+                    >
+                        Move the dock left to bring it closer on ultrawide
+                        monitors. Takes effect when saved.
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Slider
+                            min={0}
+                            max={MAX_OFFSET}
+                            step={10}
+                            value={form.offsetX}
+                            onChange={(_, value) =>
+                                setForm((f) => ({
+                                    ...f,
+                                    offsetX: Number(value),
+                                }))
+                            }
+                        />
+                        <Input
+                            type="number"
+                            value={form.offsetX}
+                            endDecorator="px"
+                            onChange={(e) =>
+                                setForm((f) => ({
+                                    ...f,
+                                    offsetX: Math.min(
+                                        MAX_OFFSET,
+                                        Math.max(
+                                            0,
+                                            Number(e.target.value) || 0,
+                                        ),
+                                    ),
+                                }))
+                            }
+                            slotProps={{
+                                input: { min: 0, max: MAX_OFFSET, step: 10 },
+                            }}
+                            sx={{ width: 130 }}
+                        />
+                    </Box>
+                </Box>
             </Section>
 
             <Section

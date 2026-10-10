@@ -98,6 +98,7 @@ export default class SettingsChannel implements IpcChannelInterface {
                         // eslint-disable-next-line no-underscore-dangle
                         id: existing._id ?? '0',
                         display: settingsJson.display,
+                        offsetX: settingsJson.offsetX,
                         steamLibraryCache: settingsJson.steamLibraryCache,
                         steamGamesLibrary: settingsJson.steamGamesLibrary,
                     });

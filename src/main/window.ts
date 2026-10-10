@@ -2,12 +2,21 @@ import { BrowserWindow, Display, screen } from 'electron';
 
 export const PREFERRED_WIDTH = 500;
 
-// Docks the launcher strip to the right edge of the given display.
-export function positionWindow(window: BrowserWindow, display: Display): void {
+// Docks the launcher strip to the right edge of the given display, shifted
+// `offset` pixels along the horizontal axis (positive moves it left, away
+// from the right edge; negative moves it right).
+export function positionWindow(
+    window: BrowserWindow,
+    display: Display,
+    offset: number = 0,
+): void {
     const factor = display.scaleFactor;
     window.setPosition(
         Math.round(
-            display.size.width - PREFERRED_WIDTH / factor + display.bounds.x,
+            display.size.width -
+                PREFERRED_WIDTH / factor +
+                display.bounds.x -
+                offset,
         ),
         display.bounds.y,
     );
