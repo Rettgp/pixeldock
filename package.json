@@ -1,6 +1,6 @@
 {
     "name": "pixeldock",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "description": "A game launcher designed to be an overlay for desktops",
     "keywords": [
         "electron",
